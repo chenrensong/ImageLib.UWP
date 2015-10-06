@@ -1,0 +1,17 @@
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\bin\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\bin\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\bin\Debug\ImageLib.pri
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\ImageLib.csprojResolveAssemblyReference.cache
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\priconfig.xml
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\priconfig.xml.intermediate
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\layout.resfiles
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\layout.resfiles.intermediate
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\resources.resfiles
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\resources.resfiles.intermediate
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\pri.resfiles
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\pri.resfiles.intermediate
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\qualifiers.txt
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\qualifiers.txt.intermediate
+D:\Projects\WindowsProjects\ImageLib.UWP\ImageLib\obj\Debug\MultipleQualifiersPerDimensionFound.txt

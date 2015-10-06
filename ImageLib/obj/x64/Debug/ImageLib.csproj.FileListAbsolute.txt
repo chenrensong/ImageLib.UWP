@@ -1,0 +1,36 @@
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\bin\x64\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\bin\x64\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\bin\x64\Debug\ImageLib.pri
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\ImageLib.csprojResolveAssemblyReference.cache
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\ResourceHandlingTask.state
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\priconfig.xml
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\priconfig.xml.intermediate
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\layout.resfiles
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\layout.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\resources.resfiles
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\resources.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\pri.resfiles
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\pri.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\qualifiers.txt
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\qualifiers.txt.intermediate
+D:\Projects\WindowsProjects\TiebaUWP - 副本\ImageLib\obj\x64\Debug\MultipleQualifiersPerDimensionFound.txt
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\bin\x64\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\bin\x64\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\bin\x64\Debug\ImageLib.pri
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\ImageLib.csprojResolveAssemblyReference.cache
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\ImageLib.dll
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\ImageLib.pdb
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\ResourceHandlingTask.state
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\priconfig.xml
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\priconfig.xml.intermediate
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\layout.resfiles
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\layout.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\resources.resfiles
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\resources.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\pri.resfiles
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\pri.resfiles.intermediate
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\qualifiers.txt
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\qualifiers.txt.intermediate
+D:\Projects\WindowsProjects\TiebaUWP\ImageLib\obj\x64\Debug\MultipleQualifiersPerDimensionFound.txt
