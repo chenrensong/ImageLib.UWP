@@ -128,7 +128,7 @@ namespace ImageLib.Controls
                 try
                 {
                     this.OnLoadingStarted();
-                    var readStream = await uriSource.GetStreamFromUri(cancellationTokenSource.Token);
+                    var randStream = await uriSource.GetStreamFromUri(cancellationTokenSource.Token);
                     if (!uriSource.Equals(UriSource))
                     {
                         return;
@@ -136,32 +136,37 @@ namespace ImageLib.Controls
                     ImageSource imageSource = null;
                     bool hasDecoder = false;
                     //debug模式不允许Decoders,直接采用默认方案
-                    //if (!DesignMode.DesignModeEnabled)
-                    var decoders = Decoders.GetAvailableDecoders();
-                    if (decoders.Count > 0)
+                    if (!DesignMode.DesignModeEnabled)
                     {
-                        int maxHeaderSize = decoders.Max(x => x.HeaderSize);
-                        if (maxHeaderSize > 0)
+                        var decoders = Decoders.GetAvailableDecoders();
+                        if (decoders.Count > 0)
                         {
-                            byte[] header = new byte[maxHeaderSize];
-                            await readStream.AsStreamForRead().ReadAsync(header, 0, maxHeaderSize);
-                            var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
-                            if (decoder != null)
+                            int maxHeaderSize = decoders.Max(x => x.HeaderSize);
+                            if (maxHeaderSize > 0)
                             {
-                                imageSource = await decoder.InitializeAsync(readStream);
-                                _imageDecoder = decoder;
-                                if (_isControlLoaded)
+                                byte[] header = new byte[maxHeaderSize];
+
+                                var readStream = randStream.AsStreamForRead();
+                                await readStream.ReadAsync(header, 0, maxHeaderSize);
+                                readStream.Position = 0;
+                                var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
+                                if (decoder != null)
                                 {
-                                    _imageDecoder.Start();
+                                    imageSource = await decoder.InitializeAsync(randStream);
+                                    _imageDecoder = decoder;
+                                    if (_isControlLoaded)
+                                    {
+                                        _imageDecoder.Start();
+                                    }
+                                    hasDecoder = true;
                                 }
-                                hasDecoder = true;
                             }
                         }
                     }
                     if (!hasDecoder)
                     {
                         var bitmapImage = new BitmapImage();
-                        await bitmapImage.SetSourceAsync(readStream).AsTask(_initializationCancellationTokenSource.Token);
+                        await bitmapImage.SetSourceAsync(randStream).AsTask(_initializationCancellationTokenSource.Token);
                         imageSource = bitmapImage;
                     }
 
