@@ -118,7 +118,7 @@ namespace ImageLib.Gif
 
         public void Start()
         {
-            if (_isInitialized)
+            if (_isInitialized && !_isAnimating)
             {
                 _currentFrameIndex = 0;
                 _completedLoops = 0;

@@ -85,23 +85,8 @@ namespace ImageLib.Controls
         public ImageView()
         {
             this.InitializeComponent();
-
-            this.Loaded += ((s, e) =>
-            {
-                // 注册事件（VisibilityChanged），当最小化的时候停止动画。
-                Window.Current.VisibilityChanged += OnVisibilityChanged;
-                // Register for SurfaceContentsLost to recreate the image source if necessary
-                CompositionTarget.SurfaceContentsLost += OnSurfaceContentsLost;
-            });
-            this.Unloaded -= ((s, e) =>
-            {
-                // 解注册事件
-                Window.Current.VisibilityChanged += OnVisibilityChanged;
-                CompositionTarget.SurfaceContentsLost -= OnSurfaceContentsLost;
-
-            });
-
         }
+
 
         private async static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -237,12 +222,19 @@ namespace ImageLib.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            // 注册事件（VisibilityChanged），当最小化的时候停止动画。
+            Window.Current.VisibilityChanged += OnVisibilityChanged;
+            // Register for SurfaceContentsLost to recreate the image source if necessary
+            CompositionTarget.SurfaceContentsLost += OnSurfaceContentsLost;
             _isControlLoaded = true;
             _imageDecoder?.Start();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            // 解注册事件
+            Window.Current.VisibilityChanged += OnVisibilityChanged;
+            CompositionTarget.SurfaceContentsLost -= OnSurfaceContentsLost;
             _isControlLoaded = false;
             _imageDecoder?.Stop();
         }
