@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Controls", "..\Ima
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Gif", "..\ImageLib.Gif\ImageLib.Gif.csproj", "{248A9A1C-18A7-4101-9EBF-CFE1FC23A1B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimatedGif", "..\..\..\..\Windows-universal-samples-master\Samples\XamlAnimatedGif\cs\AnimatedGif.csproj", "{E2977354-9F34-43F1-BAB7-E29A912CCB7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,26 @@ Global
 		{248A9A1C-18A7-4101-9EBF-CFE1FC23A1B0}.Release|x64.Build.0 = Release|x64
 		{248A9A1C-18A7-4101-9EBF-CFE1FC23A1B0}.Release|x86.ActiveCfg = Release|x86
 		{248A9A1C-18A7-4101-9EBF-CFE1FC23A1B0}.Release|x86.Build.0 = Release|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|ARM.Build.0 = Debug|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|ARM.Deploy.0 = Debug|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x64.ActiveCfg = Debug|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x64.Build.0 = Debug|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x64.Deploy.0 = Debug|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x86.ActiveCfg = Debug|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x86.Build.0 = Debug|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Debug|x86.Deploy.0 = Debug|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|Any CPU.ActiveCfg = Release|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|ARM.ActiveCfg = Release|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|ARM.Build.0 = Release|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|ARM.Deploy.0 = Release|ARM
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x64.ActiveCfg = Release|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x64.Build.0 = Release|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x64.Deploy.0 = Release|x64
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x86.ActiveCfg = Release|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x86.Build.0 = Release|x86
+		{E2977354-9F34-43F1-BAB7-E29A912CCB7F}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

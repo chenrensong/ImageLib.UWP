@@ -46,7 +46,7 @@ namespace ImageLib
         /// </summary>
         public int PixelWidth { get; internal set; }
 
-     
+
 
         /// <summary>
         /// Build
@@ -75,10 +75,7 @@ namespace ImageLib
                 if (maxHeaderSize > 0)
                 {
                     byte[] header = new byte[maxHeaderSize];
-                    var resAsStream = res.AsStream();
-                    resAsStream.Seek(0L, SeekOrigin.Begin);
-                    resAsStream.Read(header, 0, maxHeaderSize);
-                    resAsStream.Position = 0;
+                    await res.AsStreamForRead().ReadAsync(header, 0, maxHeaderSize);
                     var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
                     if (decoder != null)
                     {
@@ -114,6 +111,10 @@ namespace ImageLib
                         image.Source = this.Frames[0].BitmapFrame;
                     }
                 }
+                else
+                {
+                    image.Source = null;
+                }
             }
         }
 
@@ -142,7 +143,7 @@ namespace ImageLib
             }
             else
             {
-                RandomAccessStreamReference task = RandomAccessStreamReference.CreateFromUri(uri);
+                var task = RandomAccessStreamReference.CreateFromUri(uri);
                 return await task.OpenReadAsync().AsTask(_cancellationTokenSource.Token);
             }
         }

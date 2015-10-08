@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 
@@ -49,12 +50,15 @@ namespace ImageLib
                 keyFrame.Value = item.BitmapFrame;
                 ts = ts.Add(item.Delay);
                 anim.KeyFrames.Add(keyFrame);
+
+                Debug.Write("width:" + item.BitmapFrame.PixelWidth +
+                    "height:" + item.BitmapFrame.PixelHeight + "delay:" + item.Delay + "\n");
             }
 
             //  Connect the image control with the story board
             Storyboard.SetTarget(anim, targetImage);
             Storyboard.SetTargetProperty(anim, "Source");
-
+            //targetImage.Stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill;
             //  And finally add the animation-set to the storyboard
             _storyboard.Children.Add(anim);
         }

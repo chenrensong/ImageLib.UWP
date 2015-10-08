@@ -6,10 +6,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:ImageView">
+
+                    <!--Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"-->
                     <Image
                         x:Name="Image"
-                        Height="{TemplateBinding Height}"
-                        Width="{TemplateBinding Width}"
+                    
                         Stretch="{TemplateBinding Stretch}">
                     </Image>
                 </ControlTemplate>

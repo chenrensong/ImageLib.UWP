@@ -61,7 +61,7 @@ namespace ImageLib.IO
         public async Task DecodeAsync(ImagePresenter imagePresenter, IRandomAccessStream stream,
             CancellationToken token)
         {
-
+           
             if (imagePresenter == null || stream == null)
             {
                 return;
@@ -117,7 +117,7 @@ namespace ImageLib.IO
                         decoder.BitmapAlphaMode, bitmapTransform,
                         ExifOrientationMode.IgnoreExifOrientation, ColorManagementMode.DoNotColorManage);
                     var pixels = pixelDataProvider.DetachPixelData();
-
+                   
                     using (var bitmapStream = writeableBitmap.PixelBuffer.AsStream())
                     {
                         bitmapStream.Write(pixels, 0, pixels.Length);
