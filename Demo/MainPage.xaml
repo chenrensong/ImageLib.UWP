@@ -1,0 +1,36 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Controls="using:ImageLib.Controls"
+    x:Class="Demo.MainPage"
+    mc:Ignorable="d">
+    <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="10">
+            <TextBlock
+				TextWrapping="Wrap"
+				Text="Set the UriSource property of ImageView to an http:, https:, ms-appx: or ms-appdata: URI to display a jpg、png、gif.... " />
+            <Controls:ImageView 
+                Margin="0,20"
+                UriSource="http://img5.duitang.com/uploads/item/201411/25/20141125200101_QQjNY.gif"
+                Stretch="None"
+               />
+            <Controls:ImageView 
+                Margin="0,20"
+                UriSource="ms-appx:///Images/2.gif"
+                Stretch="None"
+               />
+            <Controls:ImageView 
+                Margin="0,20"
+                UriSource="ms-appx:///Images/3.gif"
+                Stretch="None"
+               />
+            <Controls:ImageView 
+                Margin="0,20"
+                UriSource="ms-appx:///Images/4.gif"
+                Stretch="None"
+               />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

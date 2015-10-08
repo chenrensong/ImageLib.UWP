@@ -113,12 +113,8 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnimationState.cs" />
-    <Compile Include="ImageAnimation.cs" />
-    <Compile Include="ImagePresenter.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\Guard.cs" />
-    <Compile Include="ImageFrame.cs" />
     <Compile Include="IO\Decoders.cs" />
     <Compile Include="IO\IImageDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

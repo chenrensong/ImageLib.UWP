@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media;
 
 namespace ImageLib.IO
 {
@@ -12,21 +13,6 @@ namespace ImageLib.IO
         /// </summary>
         /// <value>The size of the header.</value>
         int HeaderSize { get; }
-
-        /// <summary>
-        /// Indicates if the image decoder supports the specified
-        /// file extension.
-        /// </summary>
-        /// <param name="extension">The file extension.</param>
-        /// <returns>
-        /// <c>true</c>, if the decoder supports the specified
-        /// extensions; otherwise <c>false</c>.
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException"><paramref name="extension"/>
-        /// is null (Nothing in Visual Basic).</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="extension"/> is a string
-        /// of length zero or contains only blanks.</exception>
-        bool IsSupportedFileExtension(string extension);
 
         /// <summary>
         /// Indicates if the image decoder supports the specified
@@ -42,11 +28,26 @@ namespace ImageLib.IO
         bool IsSupportedFileFormat(byte[] header);
 
         /// <summary>
-        /// Decode Image
+        /// 执行播放(动态图片)
         /// </summary>
-        /// <param name="imagePresenter"></param>
-        /// <param name="stream"></param>
+        void Start();
+        /// <summary>
+        /// 执行停止(动态图片)
+        /// </summary>
+        void Stop();
+
+        /// <summary>
+        /// Recreate Surfaces
+        /// </summary>
         /// <returns></returns>
-        Task DecodeAsync(ImagePresenter imagePresenter, IRandomAccessStream stream, CancellationToken token);
+        ImageSource RecreateSurfaces();
+
+        /// <summary>
+        /// 异步初始化
+        /// </summary>
+        /// <param name="streamSource"></param>
+        /// <returns></returns>
+        Task<ImageSource> InitializeAsync(IRandomAccessStream streamSource);
+
     }
 }
