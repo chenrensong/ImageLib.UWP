@@ -23,7 +23,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 
-namespace ImageLib
+namespace ImageLib.Gif
 {
     public sealed class GifDecoder : IImageDecoder
     {
@@ -40,18 +40,7 @@ namespace ImageLib
 
         public bool IsSupportedFileFormat(byte[] header)
         {
-            bool isGif = false;
-            if (header.Length >= 6)
-            {
-                isGif =
-                    header[0] == 0x47 && // G
-                    header[1] == 0x49 && // I
-                    header[2] == 0x46 && // F
-                    header[3] == 0x38 && // 8
-                   (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
-                    header[5] == 0x61;   // a
-            }
-            return isGif;
+            return GifHelper.IsGif(header);
         }
 
         #region Private struct declarations
@@ -458,7 +447,7 @@ namespace ImageLib
                 );
         }
 
-    
+
         #endregion
 
     }

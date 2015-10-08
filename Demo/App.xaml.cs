@@ -1,4 +1,5 @@
 ﻿using ImageLib;
+using ImageLib.Gif;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;

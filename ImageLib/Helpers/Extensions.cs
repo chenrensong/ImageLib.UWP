@@ -82,7 +82,7 @@ namespace ImageLib.Helpers
 
         public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
         {
-            Contract.Requires<ArgumentNullException>(uri != null, "Uri cannot be null.");
+            //Contract.Requires<ArgumentNullException>(uri == null, "Uri cannot be null.");
             if (uri.IsFile)
             {
                 var storageFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
@@ -165,8 +165,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void Foreach<T>(this IEnumerable<T> items, Action<T> action)
         {
-            Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
-            Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
+            //Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
+            //Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
 
             foreach (T item in items)
             {
@@ -189,8 +189,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void Foreach(this IEnumerable items, Action<object> action)
         {
-            Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
-            Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
+            //Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
+            //Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
 
             foreach (object item in items)
             {
@@ -214,8 +214,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void AddRange<TItem>(this ObservableCollection<TItem> target, IEnumerable<TItem> elements)
         {
-            Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
-            Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
+            //Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
+            //Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
 
             foreach (TItem item in elements)
             {
@@ -236,8 +236,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void AddRange<TItem>(this Collection<TItem> target, IEnumerable<TItem> elements)
         {
-            Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
-            Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
+            //Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
+            //Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
 
             foreach (TItem item in elements)
             {

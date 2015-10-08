@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GifDecoder.cs" />
+    <Compile Include="GifHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Properties\ImageLib.Gif.rd.xml" />
   </ItemGroup>

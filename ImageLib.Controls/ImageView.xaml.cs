@@ -10,7 +10,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -19,14 +18,24 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using ImageLib.IO;
 using ImageLib.Helpers;
+using Windows.ApplicationModel;
 
 namespace ImageLib.Controls
 {
     public sealed partial class ImageView : UserControl
     {
         #region Public Events
+        /// <summary>
+        /// 开始加载
+        /// </summary>
         public event EventHandler LoadingStarted;
+        /// <summary>
+        /// 加载完成
+        /// </summary>
         public event EventHandler LoadingCompleted;
+        /// <summary>
+        /// 加载失败
+        /// </summary>
         public event EventHandler<Exception> LoadingFailed;
         #endregion
 
@@ -70,7 +79,7 @@ namespace ImageLib.Controls
         }
 
         private IImageDecoder _imageDecoder;
-        private bool _isLoaded;
+        private bool _isControlLoaded;
         private CancellationTokenSource _initializationCancellationTokenSource;
 
         public ImageView()
@@ -99,11 +108,7 @@ namespace ImageLib.Controls
             var that = d as ImageView;
             await that?.UpdateSourceAsync();
         }
-        private static DateTime Jan1st1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        public static long CurrentTimeMillis(DateTime d)
-        {
-            return (long)((DateTime.UtcNow - Jan1st1970).TotalMilliseconds);
-        }
+
         private async Task UpdateSourceAsync()
         {
 
@@ -130,6 +135,8 @@ namespace ImageLib.Controls
                     }
                     ImageSource imageSource = null;
                     bool hasDecoder = false;
+                    //debug模式不允许Decoders,直接采用默认方案
+                    //if (!DesignMode.DesignModeEnabled)
                     var decoders = Decoders.GetAvailableDecoders();
                     if (decoders.Count > 0)
                     {
@@ -143,7 +150,7 @@ namespace ImageLib.Controls
                             {
                                 imageSource = await decoder.InitializeAsync(readStream);
                                 _imageDecoder = decoder;
-                                if (_isLoaded)
+                                if (_isControlLoaded)
                                 {
                                     _imageDecoder.Start();
                                 }
@@ -157,7 +164,6 @@ namespace ImageLib.Controls
                         await bitmapImage.SetSourceAsync(readStream).AsTask(_initializationCancellationTokenSource.Token);
                         imageSource = bitmapImage;
                     }
-
 
                     _image.Source = imageSource;
 
@@ -203,6 +209,7 @@ namespace ImageLib.Controls
         private void OnFail(Exception ex)
         {
             this.IsLoading = false;
+            _image.Source = null;
             if (LoadingFailed != null)
             {
                 LoadingFailed.Invoke(this, ex);
@@ -225,13 +232,13 @@ namespace ImageLib.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            _isLoaded = true;
+            _isControlLoaded = true;
             _imageDecoder?.Start();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            _isLoaded = false;
+            _isControlLoaded = false;
             _imageDecoder?.Stop();
         }
 
