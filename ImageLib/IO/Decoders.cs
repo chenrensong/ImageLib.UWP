@@ -1,10 +1,15 @@
-﻿using System;
+﻿// ===============================================================================
+// Decoders.cs
+// ImageLib for UWP
+// ===============================================================================
+// Copyright (c) 陈仁松. 
+// All rights reserved.
+// ===============================================================================
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ImageLib.IO
 {
@@ -46,6 +51,6 @@ namespace ImageLib.IO
             return new ReadOnlyCollection<IImageDecoder>(decoders);
         }
 
-   
+
     }
 }

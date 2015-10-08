@@ -1,15 +1,14 @@
 ﻿// ===============================================================================
 // Rectangle.cs
-// .NET Image Tools
+// ImageLib for UWP
 // ===============================================================================
-// Copyright (c) .NET Image Tools Development Group. 
+// Copyright (c) 陈仁松. 
 // All rights reserved.
 // ===============================================================================
 
 namespace ImageLib
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Stores a set of four integers that represent the location and 

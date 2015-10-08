@@ -1,34 +1,22 @@
 ﻿// ===============================================================================
 // Extensions.cs
-// .NET Image Tools
+// ImageLib for UWP
 // ===============================================================================
-// Copyright (c) .NET Image Tools Development Group. 
+// Copyright (c) 陈仁松. 
 // All rights reserved.
 // ===============================================================================
 
-#if NETFX_CORE
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Storage;
 using Windows.Storage.Streams;
-#else
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Resources;
-#endif
 
 namespace ImageLib.Helpers
 {
@@ -53,11 +41,9 @@ namespace ImageLib.Helpers
         /// <exception cref="ArgumentException"><paramref name="bits"/> is greater or equals than zero.</exception>
         public static byte[] ToArrayByBitsLength(this byte[] bytes, int bits)
         {
-#if !NETFX_CORE
             Contract.Requires<ArgumentNullException>(bytes != null, "Bytes cannot be null.");
             Contract.Requires<ArgumentException>(bits > 0, "Bits must be greater than zero.");
             Contract.Ensures(Contract.Result<byte[]>() != null);
-#endif
 
             byte[] result = null;
 
@@ -93,56 +79,24 @@ namespace ImageLib.Helpers
             return result;
         }
 
-#if NETFX_CORE
 
-        public async static Task<Stream> GetStreamFromUri(Uri uri)
-        {
-            //Contract.Requires<ArgumentNullException>(uri != null, "Uri cannot be null.");
-            var streamRef = RandomAccessStreamReference.CreateFromUri(uri);
-
-            var stream = await streamRef.OpenReadAsync();
-            {
-                return stream.AsStream();
-            }
-        }
-#else
-
-        /// <summary>
-        /// Gets the stream to a local resource
-        /// </summary>
-        /// <param name="uri">The path to the local stream. Cannot be null.</param>
-        /// <returns>The stream to the local resource when such a resource exists or null otherwise.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="uri"/> is null.</exception>
-        public static Stream GetLocalResourceStream(Uri uri)
+        public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
         {
             Contract.Requires<ArgumentNullException>(uri != null, "Uri cannot be null.");
-
-            StreamResourceInfo info = Application.GetResourceStream(uri);
-            if (info == null)
+            if (uri.IsFile)
             {
-                Application app = Application.Current;
-
-                if (app != null)
-                {
-                    Type appplicationType = app.GetType();
-
-                    string assemblyName = appplicationType.Assembly.FullName.Split(new char[] { ',' })[0];
-
-                    string uriString = uri.OriginalString;
-                    uriString = string.Format(CultureInfo.CurrentCulture, "{0};component/{1}", assemblyName, uriString);
-                    uriString = uriString.Replace("\\", "/");
-                    uriString = uriString.Replace("//", "/");
-
-                    Uri resourceUri = new Uri(uriString, UriKind.Relative);
-
-                    info = Application.GetResourceStream(resourceUri);
-                }
+                var storageFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
+                return await storageFile.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
             }
-
-            Stream stream = info != null ? info.Stream : null;
-            return stream;
+            else
+            {
+                RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
+                return await streamRef.OpenReadAsync().AsTask(cancellationToken);
+            }
         }
-#endif
+
+
+
 
         /// <summary>
         /// Multiplies the values of the specified rectangle by the factor.
@@ -211,10 +165,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void Foreach<T>(this IEnumerable<T> items, Action<T> action)
         {
-#if !NETFX_CORE
             Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
             Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
-#endif
 
             foreach (T item in items)
             {
@@ -237,10 +189,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void Foreach(this IEnumerable items, Action<object> action)
         {
-#if !NETFX_CORE
             Contract.Requires<ArgumentNullException>(items != null, "Items cannot be null");
             Contract.Requires<ArgumentNullException>(action != null, "Action cannot be null.");
-#endif
 
             foreach (object item in items)
             {
@@ -264,10 +214,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void AddRange<TItem>(this ObservableCollection<TItem> target, IEnumerable<TItem> elements)
         {
-#if !NETFX_CORE
             Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
             Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
-#endif
 
             foreach (TItem item in elements)
             {
@@ -288,10 +236,8 @@ namespace ImageLib.Helpers
         /// </exception>
         public static void AddRange<TItem>(this Collection<TItem> target, IEnumerable<TItem> elements)
         {
-#if !NETFX_CORE
             Contract.Requires<ArgumentNullException>(target != null, "Target cannot be null");
             Contract.Requires<ArgumentNullException>(elements != null, "Elements cannot be null.");
-#endif
 
             foreach (TItem item in elements)
             {

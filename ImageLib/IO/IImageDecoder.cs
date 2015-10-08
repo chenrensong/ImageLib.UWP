@@ -1,4 +1,12 @@
-﻿using System.Threading;
+﻿// ===============================================================================
+// IImageDecoder.cs
+// ImageLib for UWP
+// ===============================================================================
+// Copyright (c) 陈仁松. 
+// All rights reserved.
+// ===============================================================================
+
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media;

@@ -1,4 +1,12 @@
-﻿using ImageLib.IO;
+﻿// ===============================================================================
+// GifDecoder.cs
+// ImageLib for UWP
+// ===============================================================================
+// Copyright (c) 陈仁松. 
+// All rights reserved.
+// ===============================================================================
+
+using ImageLib.IO;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
@@ -15,10 +23,37 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 
-namespace AnimatedGif
+namespace ImageLib
 {
     public sealed class GifDecoder : IImageDecoder
     {
+        /// <summary>
+        /// Gif头为6
+        /// </summary>
+        public int HeaderSize
+        {
+            get
+            {
+                return 6;
+            }
+        }
+
+        public bool IsSupportedFileFormat(byte[] header)
+        {
+            bool isGif = false;
+            if (header.Length >= 6)
+            {
+                isGif =
+                    header[0] == 0x47 && // G
+                    header[1] == 0x49 && // I
+                    header[2] == 0x46 && // F
+                    header[3] == 0x38 && // 8
+                   (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
+                    header[5] == 0x61;   // a
+            }
+            return isGif;
+        }
+
         #region Private struct declarations
         private struct ImageProperties
         {
@@ -69,16 +104,6 @@ namespace AnimatedGif
         private bool _isAnimating;
         private bool _hasCanvasResources;
 
-        /// <summary>
-        /// Gif头为6
-        /// </summary>
-        public int HeaderSize
-        {
-            get
-            {
-                return 6;
-            }
-        }
 
         public async Task<ImageSource> InitializeAsync(IRandomAccessStream streamSource)
         {
@@ -433,22 +458,7 @@ namespace AnimatedGif
                 );
         }
 
-        public bool IsSupportedFileFormat(byte[] header)
-        {
-            bool isGif = false;
-            if (header.Length >= 6)
-            {
-                isGif =
-                    header[0] == 0x47 && // G
-                    header[1] == 0x49 && // I
-                    header[2] == 0x46 && // F
-                    header[3] == 0x38 && // 8
-                   (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
-                    header[5] == 0x61;   // a
-            }
-            return isGif;
-        }
-
+    
         #endregion
 
     }

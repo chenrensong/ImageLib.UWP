@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ===============================================================================
+// ImageView.cs
+// ImageLib for UWP
+// ===============================================================================
+// Copyright (c) 陈仁松. 
+// All rights reserved.
+// ===============================================================================
+
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +18,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using ImageLib.IO;
+using ImageLib.Helpers;
 
 namespace ImageLib.Controls
 {
@@ -17,7 +26,7 @@ namespace ImageLib.Controls
     {
         #region Public Events
         public event EventHandler LoadingStarted;
-        public event EventHandler<LoadingCompletedEventArgs> LoadingCompleted;
+        public event EventHandler LoadingCompleted;
         public event EventHandler<Exception> LoadingFailed;
         #endregion
 
@@ -34,6 +43,19 @@ namespace ImageLib.Controls
             typeof(ImageView),
             new PropertyMetadata(null, new PropertyChangedCallback(OnSourcePropertyChanged))
             );
+
+        private static DependencyProperty IsLoadingProperty { get; } = DependencyProperty.Register(
+            nameof(IsLoading),
+            typeof(bool),
+            typeof(ImageView),
+            new PropertyMetadata(false)
+            );
+
+        public bool IsLoading
+        {
+            get { return (bool)GetValue(IsLoadingProperty); }
+            set { SetValue(IsLoadingProperty, value); }
+        }
 
         public Stretch Stretch
         {
@@ -101,9 +123,11 @@ namespace ImageLib.Controls
                 try
                 {
                     this.OnLoadingStarted();
-
-                    var streamReference = RandomAccessStreamReference.CreateFromUri(uriSource);
-                    var readStream = await streamReference.OpenReadAsync().AsTask(cancellationTokenSource.Token);
+                    var readStream = await uriSource.GetStreamFromUri(cancellationTokenSource.Token);
+                    if (!uriSource.Equals(UriSource))
+                    {
+                        return;
+                    }
                     ImageSource imageSource = null;
                     bool hasDecoder = false;
                     var decoders = Decoders.GetAvailableDecoders();
@@ -133,14 +157,17 @@ namespace ImageLib.Controls
                         await bitmapImage.SetSourceAsync(readStream).AsTask(_initializationCancellationTokenSource.Token);
                         imageSource = bitmapImage;
                     }
+
+
                     _image.Source = imageSource;
-                    //暂时未实现
-                    this.OnLoadingCompleted(0, 0);
+
+                    this.OnLoadingCompleted();
 
                 }
                 catch (TaskCanceledException)
                 {
-                    // Just keep the empty image source.
+                    // Task Canceled 需要设置Souce=null.
+                    _image.Source = null;
                 }
                 catch (FileNotFoundException fnfex)
                 {
@@ -157,22 +184,25 @@ namespace ImageLib.Controls
 
         private void OnLoadingStarted()
         {
+            this.IsLoading = true;
             if (LoadingStarted != null)
             {
                 LoadingStarted.Invoke(this, EventArgs.Empty);
             }
         }
 
-        private void OnLoadingCompleted(double width, double height)
+        private void OnLoadingCompleted()
         {
+            this.IsLoading = false;
             if (LoadingCompleted != null)
             {
-                LoadingCompleted.Invoke(this, new LoadingCompletedEventArgs(width, height));
+                LoadingCompleted.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void OnFail(Exception ex)
         {
+            this.IsLoading = false;
             if (LoadingFailed != null)
             {
                 LoadingFailed.Invoke(this, ex);
