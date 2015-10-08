@@ -3,7 +3,7 @@
   同时支持实现[IImageDecoder](https://github.com/chenrensong/ImageLib.UWP/blob/master/ImageLib/IO/IImageDecoder.cs)接口来支持更多图片格式。
 ##支持URI格式
   http:, https:, ms-appx:,ms-appdata:
-##支持系统
+##支持平台
   **Client:** Windows 10
   
   **Server:** Windows Server 2016 
@@ -11,3 +11,6 @@
   **Phone:**  Windows 10 
 ##开发工具
   Visual Studio 2015 
+# Nuget
+``` c#
+PM> Install-Package ImageLib.UWP
