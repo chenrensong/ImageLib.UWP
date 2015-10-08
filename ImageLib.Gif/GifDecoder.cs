@@ -207,6 +207,11 @@ namespace ImageLib.Gif
 
         private void CreateCanvasResources()
         {
+            if (_hasCanvasResources)
+            {
+                return;
+            }
+
             const float desiredDpi = 96.0f; // GIF does not encode DPI
 
             var sharedDevice = GetSharedDevice();
