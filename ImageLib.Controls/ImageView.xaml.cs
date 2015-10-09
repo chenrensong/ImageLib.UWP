@@ -85,8 +85,19 @@ namespace ImageLib.Controls
         public ImageView()
         {
             this.InitializeComponent();
+            //this.Loaded += ImageView_Loaded;
+            //this.Unloaded += ImageView_Unloaded;
         }
 
+        //private void ImageView_Unloaded(object sender, RoutedEventArgs e)
+        //{
+
+        //}
+
+        //private void ImageView_Loaded(object sender, RoutedEventArgs e)
+        //{
+
+        //}
 
         private async static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -166,7 +177,7 @@ namespace ImageLib.Controls
                         var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
                         if (decoder != null)
                         {
-                            imageSource = await decoder.InitializeAsync(randStream);
+                            imageSource = await decoder.InitializeAsync(this.Dispatcher, randStream);
                             _imageDecoder = decoder;
                             if (_isControlLoaded)
                             {
@@ -185,6 +196,7 @@ namespace ImageLib.Controls
                 await bitmapImage.SetSourceAsync(randStream).AsTask(cancellationTokenSource.Token);
                 imageSource = bitmapImage;
             }
+
 
             return imageSource;
         }
@@ -245,7 +257,7 @@ namespace ImageLib.Controls
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             // 解注册事件
-            Window.Current.VisibilityChanged += OnVisibilityChanged;
+            Window.Current.VisibilityChanged -= OnVisibilityChanged;
             CompositionTarget.SurfaceContentsLost -= OnSurfaceContentsLost;
             _isControlLoaded = false;
             _image.Source = null;

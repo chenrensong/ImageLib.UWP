@@ -19,6 +19,7 @@ using Windows.Graphics.DirectX;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
@@ -83,15 +84,15 @@ namespace ImageLib.Gif
                 {
                     return this.Pixels;
                 }
-                var frame = await bitmapDecoder.GetFrameAsync(FrameIndex);
+                var frame = await bitmapDecoder.GetFrameAsync(FrameIndex);//.AsTask().ConfigureAwait(false);
                 var pixelData = await frame.GetPixelDataAsync(
                     BitmapPixelFormat.Bgra8,
                     BitmapAlphaMode.Premultiplied,
                     new BitmapTransform(),
                     ExifOrientationMode.IgnoreExifOrientation,
                     ColorManagementMode.DoNotColorManage
-                    );
-               
+                    );//.AsTask().ConfigureAwait(false);
+
                 this.Pixels = pixelData.DetachPixelData();
                 _isDecode = true;
                 return Pixels;
@@ -120,15 +121,17 @@ namespace ImageLib.Gif
         private bool _hasCanvasResources;
 
 
-        public async Task<ImageSource> InitializeAsync(IRandomAccessStream streamSource)
+        public async Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource)
         {
-            var bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, streamSource);
+            var bitmapDecoder = await BitmapDecoder.
+                CreateAsync(BitmapDecoder.GifDecoderId, streamSource).AsTask().ConfigureAwait(false);
+
             var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
             var frameProperties = new List<FrameProperties>();
 
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
             {
-                var bitmapFrame = await bitmapDecoder.GetFrameAsync(i);
+                var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask().ConfigureAwait(false); ;
                 frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
 
             }
@@ -137,7 +140,10 @@ namespace ImageLib.Gif
             _bitmapDecoder = bitmapDecoder;
             _imageProperties = imageProperties;
 
-            CreateCanvasResources();
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+             {
+                 CreateCanvasResources();
+             });
 
             _isInitialized = true;
             return _canvasImageSource;
@@ -182,7 +188,8 @@ namespace ImageLib.Gif
 
         private async Task AdvanceFrame()
         {
-            if (_bitmapDecoder.FrameCount == 0)
+
+            if (!_isInitialized || _bitmapDecoder.FrameCount == 0)
             {
                 return;
             }
@@ -375,7 +382,7 @@ namespace ImageLib.Gif
 
             var propertiesView = bitmapDecoder.BitmapContainerProperties;
             var requiredProperties = new[] { widthProperty, heightProperty };
-            var properties = await propertiesView.GetPropertiesAsync(requiredProperties);
+            var properties = await propertiesView.GetPropertiesAsync(requiredProperties).AsTask().ConfigureAwait(false);
 
             var pixelWidth = (ushort)properties[widthProperty].Value;
             var pixelHeight = (ushort)properties[heightProperty].Value;
@@ -412,7 +419,7 @@ namespace ImageLib.Gif
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // These properties are not required, so it's okay to ignore failure.
             }
@@ -431,7 +438,7 @@ namespace ImageLib.Gif
 
             var propertiesView = frame.BitmapProperties;
             var requiredProperties = new[] { leftProperty, topProperty, widthProperty, heightProperty };
-            var properties = await propertiesView.GetPropertiesAsync(requiredProperties);
+            var properties = await propertiesView.GetPropertiesAsync(requiredProperties).AsTask().ConfigureAwait(false); ;
 
             var left = (ushort)properties[leftProperty].Value;
             var top = (ushort)properties[topProperty].Value;
@@ -444,7 +451,7 @@ namespace ImageLib.Gif
             try
             {
                 var extensionProperties = new[] { delayProperty, disposalProperty };
-                properties = await propertiesView.GetPropertiesAsync(extensionProperties);
+                properties = await propertiesView.GetPropertiesAsync(extensionProperties).AsTask().ConfigureAwait(false); ;
 
                 if (properties.ContainsKey(delayProperty))
                 {
@@ -504,6 +511,7 @@ namespace ImageLib.Gif
             if (disposing)
             {
                 this.Stop();
+                _isInitialized = false;
                 _hasCanvasResources = false;
                 _bitmapDecoder = null;
                 _frameProperties?.Clear();

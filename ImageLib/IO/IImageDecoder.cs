@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 
 namespace ImageLib.IO
@@ -53,9 +54,10 @@ namespace ImageLib.IO
         /// <summary>
         /// 异步初始化
         /// </summary>
-        /// <param name="streamSource"></param>
+        /// <param name="dispatcher">用于UI线程绘制</param>
+        /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ImageSource> InitializeAsync(IRandomAccessStream streamSource);
+        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource);
 
     }
 }
