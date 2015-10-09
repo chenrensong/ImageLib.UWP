@@ -6,14 +6,14 @@
 // All rights reserved.
 // ===============================================================================
 
-using System.Threading;
+using System;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media;
 
 namespace ImageLib.IO
 {
-    public interface IImageDecoder
+    public interface IImageDecoder : IDisposable
     {
 
         /// <summary>

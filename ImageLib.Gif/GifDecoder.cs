@@ -60,18 +60,44 @@ namespace ImageLib.Gif
             }
         }
 
-        private struct FrameProperties
+        private class FrameProperties
         {
+            private bool _isDecode = false;
             public readonly Rect Rect;
             public readonly double DelayMilliseconds;
             public readonly bool ShouldDispose;
+            public readonly uint FrameIndex;
+            public byte[] Pixels { get; private set; }
 
-            public FrameProperties(Rect rect, double delayMilliseconds, bool shouldDispose)
+            public FrameProperties(uint frameIndex, Rect rect, double delayMilliseconds, bool shouldDispose)
             {
+                FrameIndex = frameIndex;
                 Rect = rect;
                 DelayMilliseconds = delayMilliseconds;
                 ShouldDispose = shouldDispose;
             }
+
+            public async Task<byte[]> DecodeAsync(BitmapDecoder bitmapDecoder)
+            {
+                if (_isDecode)
+                {
+                    return this.Pixels;
+                }
+                var frame = await bitmapDecoder.GetFrameAsync(FrameIndex);
+                var pixelData = await frame.GetPixelDataAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Premultiplied,
+                    new BitmapTransform(),
+                    ExifOrientationMode.IgnoreExifOrientation,
+                    ColorManagementMode.DoNotColorManage
+                    );
+               
+                this.Pixels = pixelData.DetachPixelData();
+                _isDecode = true;
+                return Pixels;
+            }
+
+
         }
 
         #endregion
@@ -103,7 +129,8 @@ namespace ImageLib.Gif
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
             {
                 var bitmapFrame = await bitmapDecoder.GetFrameAsync(i);
-                frameProperties.Add(await RetrieveFramePropertiesAsync(bitmapFrame));
+                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
+
             }
 
             _frameProperties = frameProperties;
@@ -137,7 +164,14 @@ namespace ImageLib.Gif
 
         private async void AnimationTimer_Tick(object sender, object e)
         {
-            await AdvanceFrame();
+            try
+            {
+                await AdvanceFrame();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         public void Stop()
@@ -156,6 +190,7 @@ namespace ImageLib.Gif
             var frameIndex = _currentFrameIndex;
             var frameProperties = _frameProperties[frameIndex];
             var disposeRequested = _disposeRequested;
+
 
             // Increment frame index and loop count
             _currentFrameIndex++;
@@ -180,15 +215,16 @@ namespace ImageLib.Gif
             }
 
             // Decode the frame
-            var frame = await _bitmapDecoder.GetFrameAsync((uint)frameIndex);
-            var pixelData = await frame.GetPixelDataAsync(
-                BitmapPixelFormat.Bgra8,
-                BitmapAlphaMode.Premultiplied,
-                new BitmapTransform(),
-                ExifOrientationMode.IgnoreExifOrientation,
-                ColorManagementMode.DoNotColorManage
-                );
-            var pixels = pixelData.DetachPixelData();
+            //var frame = await _bitmapDecoder.GetFrameAsync((uint)frameIndex);
+            //var pixelData = await frame.GetPixelDataAsync(
+            //    BitmapPixelFormat.Bgra8,
+            //    BitmapAlphaMode.Premultiplied,
+            //    new BitmapTransform(),
+            //    ExifOrientationMode.IgnoreExifOrientation,
+            //    ColorManagementMode.DoNotColorManage
+            //    );
+            //var pixels = pixelData.DetachPixelData();
+            var pixels = await frameProperties.DecodeAsync(_bitmapDecoder);
             var frameRectangle = frameProperties.Rect;
             var shouldClear = disposeRequested || frameIndex == 0;
 
@@ -384,7 +420,7 @@ namespace ImageLib.Gif
             return new ImageProperties(pixelWidth, pixelHeight, isAnimated, loopCount);
         }
 
-        private async Task<FrameProperties> RetrieveFramePropertiesAsync(BitmapFrame frame)
+        private async Task<FrameProperties> RetrieveFramePropertiesAsync(uint index, BitmapFrame frame)
         {
             const string leftProperty = "/imgdesc/Left";
             const string topProperty = "/imgdesc/Top";
@@ -445,11 +481,37 @@ namespace ImageLib.Gif
                 // These properties are not required, so it's okay to ignore failure.
             }
 
-            return new FrameProperties(
+            return new FrameProperties(index,
                 new Rect(left, top, width, height),
                 delayMilliseconds,
                 shouldDispose
                 );
+        }
+
+        ~GifDecoder()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.Stop();
+                _hasCanvasResources = false;
+                _bitmapDecoder = null;
+                _frameProperties?.Clear();
+                _frameProperties = null;
+                _canvasImageSource = null;
+                _accumulationRenderTarget = null;
+                _animationTimer = null;
+            }
         }
 
 

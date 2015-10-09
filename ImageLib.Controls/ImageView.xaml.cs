@@ -96,10 +96,8 @@ namespace ImageLib.Controls
 
         private async Task UpdateSourceAsync()
         {
-
-            _imageDecoder?.Stop();
+            _imageDecoder?.Dispose();
             _initializationCancellationTokenSource?.Cancel();
-
             _image.Source = null;
             _imageDecoder = null;
 
@@ -250,7 +248,9 @@ namespace ImageLib.Controls
             Window.Current.VisibilityChanged += OnVisibilityChanged;
             CompositionTarget.SurfaceContentsLost -= OnSurfaceContentsLost;
             _isControlLoaded = false;
-            _imageDecoder?.Stop();
+            _image.Source = null;
+            _imageDecoder?.Dispose();
+            _imageDecoder = null;
         }
 
         private void OnSurfaceContentsLost(object sender, object e)

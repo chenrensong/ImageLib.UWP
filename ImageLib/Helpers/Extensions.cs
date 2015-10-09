@@ -14,6 +14,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Resources.Core;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -83,15 +84,36 @@ namespace ImageLib.Helpers
         public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
         {
             //Contract.Requires<ArgumentNullException>(uri == null, "Uri cannot be null.");
-            if (uri.IsFile)
+            switch (uri.Scheme)
             {
-                var storageFile = await StorageFile.GetFileFromApplicationUriAsync(uri);
-                return await storageFile.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
-            }
-            else
-            {
-                RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
-                return await streamRef.OpenReadAsync().AsTask(cancellationToken);
+                case "ms-appx":
+                case "ms-appdata":
+                    {
+                        var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
+                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                    }
+                case "ms-resource":
+                    {
+                        var rm = ResourceManager.Current;
+                        var context = ResourceContext.GetForCurrentView();
+                        var candidate = rm.MainResourceMap.GetValue(uri.LocalPath, context);
+                        if (candidate != null && candidate.IsMatch)
+                        {
+                            var file = await candidate.GetValueAsFileAsync();
+                            return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                        }
+                        throw new Exception("Resource not found");
+                    }
+                case "file":
+                    {
+                        var file = await StorageFile.GetFileFromPathAsync(uri.LocalPath);
+                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                    }
+                default:
+                    {
+                        RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
+                        return await streamRef.OpenReadAsync().AsTask(cancellationToken);
+                    }
             }
         }
 
