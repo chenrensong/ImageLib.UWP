@@ -7,6 +7,7 @@
 // ===============================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
@@ -57,7 +58,7 @@ namespace ImageLib.IO
         /// <param name="dispatcher">用于UI线程绘制</param>
         /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource);
+        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
 
     }
 }

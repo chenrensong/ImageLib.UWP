@@ -24,6 +24,10 @@ namespace ImageLib.Controls
 {
     public sealed partial class ImageView : UserControl
     {
+        //private static List<WeakReference<IImageDecoder>> ImageDecoders =
+        //    new List<WeakReference<IImageDecoder>>();
+
+
         #region Public Events
         /// <summary>
         /// 开始加载
@@ -85,19 +89,7 @@ namespace ImageLib.Controls
         public ImageView()
         {
             this.InitializeComponent();
-            //this.Loaded += ImageView_Loaded;
-            //this.Unloaded += ImageView_Unloaded;
         }
-
-        //private void ImageView_Unloaded(object sender, RoutedEventArgs e)
-        //{
-
-        //}
-
-        //private void ImageView_Loaded(object sender, RoutedEventArgs e)
-        //{
-
-        //}
 
         private async static void OnSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -110,37 +102,29 @@ namespace ImageLib.Controls
             _imageDecoder?.Dispose();
             _initializationCancellationTokenSource?.Cancel();
             _image.Source = null;
-            _imageDecoder = null;
-
+            Interlocked.Exchange(ref _imageDecoder, null);
             if (UriSource != null)
             {
                 var uriSource = UriSource;
                 var cancellationTokenSource = new CancellationTokenSource();
                 _initializationCancellationTokenSource = cancellationTokenSource;
-
                 try
                 {
                     this.OnLoadingStarted();
-                    int retryCount = 2;//重试次数
-                    while (retryCount-- > 0)
+                    var imageSource = await LoadImageByUri(uriSource, cancellationTokenSource);
+                    if (uriSource.Equals(UriSource))
                     {
-                        var imageSource = await LoadImageByUri(uriSource, cancellationTokenSource);
-                        if (uriSource.Equals(UriSource))
-                        {
-                            _image.Source = imageSource;
-                            this.OnLoadingCompleted();
-                            break;
-                        }
-                        else
-                        {
-                            uriSource = UriSource;
-                        }
+                        _image.Source = imageSource;
                     }
+                    else
+                    {
+                        //不处理此情况
+                    }
+                    this.OnLoadingCompleted();
                 }
                 catch (TaskCanceledException)
                 {
-                    // Task Canceled 需要设置Souce=null.
-                    _image.Source = null;
+                    // Task Canceled
                 }
                 catch (FileNotFoundException fnfex)
                 {
@@ -150,9 +134,7 @@ namespace ImageLib.Controls
                 {
                     this.OnFail(ex);
                 }
-
             }
-
         }
 
 
@@ -177,27 +159,28 @@ namespace ImageLib.Controls
                         var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
                         if (decoder != null)
                         {
-                            imageSource = await decoder.InitializeAsync(this.Dispatcher, randStream);
-                            _imageDecoder = decoder;
-                            if (_isControlLoaded)
+                            imageSource = await decoder.InitializeAsync(this.Dispatcher, randStream,
+                                cancellationTokenSource);
+                            if (!cancellationTokenSource.IsCancellationRequested)
                             {
-                                _imageDecoder.Start();
+                                Interlocked.Exchange(ref _imageDecoder, decoder);
+                                //ImageDecoders.Add(new WeakReference<IImageDecoder>(_imageDecoder));
+                                if (_isControlLoaded)
+                                {
+                                    _imageDecoder.Start();
+                                }
                             }
                             hasDecoder = true;
                         }
                     }
                 }
             }
-
-
             if (!hasDecoder)
             {
                 var bitmapImage = new BitmapImage();
                 await bitmapImage.SetSourceAsync(randStream).AsTask(cancellationTokenSource.Token);
                 imageSource = bitmapImage;
             }
-
-
             return imageSource;
         }
 
@@ -260,9 +243,9 @@ namespace ImageLib.Controls
             Window.Current.VisibilityChanged -= OnVisibilityChanged;
             CompositionTarget.SurfaceContentsLost -= OnSurfaceContentsLost;
             _isControlLoaded = false;
+            _initializationCancellationTokenSource?.Cancel();
             _image.Source = null;
             _imageDecoder?.Dispose();
-            _imageDecoder = null;
         }
 
         private void OnSurfaceContentsLost(object sender, object e)
@@ -278,6 +261,14 @@ namespace ImageLib.Controls
         public void Start()
         {
             _imageDecoder?.Start();
+        }
+
+        public void Dispose()
+        {
+            _imageDecoder?.Dispose();
+            _initializationCancellationTokenSource?.Cancel();
+            _image.Source = null;
+            _imageDecoder = null;
         }
 
         #endregion

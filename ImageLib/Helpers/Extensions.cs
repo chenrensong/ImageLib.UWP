@@ -90,7 +90,7 @@ namespace ImageLib.Helpers
                 case "ms-appdata":
                     {
                         var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
-                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
                     }
                 case "ms-resource":
                     {
@@ -100,19 +100,19 @@ namespace ImageLib.Helpers
                         if (candidate != null && candidate.IsMatch)
                         {
                             var file = await candidate.GetValueAsFileAsync();
-                            return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                            return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
                         }
                         throw new Exception("Resource not found");
                     }
                 case "file":
                     {
                         var file = await StorageFile.GetFileFromPathAsync(uri.LocalPath);
-                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken);
+                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
                     }
                 default:
                     {
                         RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
-                        return await streamRef.OpenReadAsync().AsTask(cancellationToken);
+                        return await streamRef.OpenReadAsync().AsTask(cancellationToken).ConfigureAwait(false);
                     }
             }
         }
