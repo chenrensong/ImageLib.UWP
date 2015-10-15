@@ -18,8 +18,7 @@
  <controls:ImageView 
             Margin="0,20"
             UriSource="ms-appx:///Images/2.gif"
-            Stretch="None"
-             />
+            Stretch="None"/>
 ```
 
 ##支持URI格式
