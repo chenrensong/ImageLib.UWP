@@ -13,7 +13,7 @@
                 "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().Build());
 ```
-## 初始化
+## XAML代码
 ``` xaml
  <Controls:ImageView 
                 Margin="0,20"
