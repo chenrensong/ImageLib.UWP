@@ -4,18 +4,18 @@
  
 ## 初始化
 ``` c#
-    ImageConfig.Initialize(new ImageConfig.Builder()
-            {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                IsLogEnabled = true,
-                MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
-                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-                "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().Build());
+  ImageConfig.Initialize(new ImageConfig.Builder()
+          {
+              CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
+              IsLogEnabled = true,
+              MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
+              StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
+              "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+          }.AddDecoder<GifDecoder>().Build());
 ```
 ## XAML代码
 ``` xaml
- <Controls:ImageView 
+ <controls:ImageView 
                 Margin="0,20"
                 UriSource="ms-appx:///Images/2.gif"
                 Stretch="None"
