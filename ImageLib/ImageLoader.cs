@@ -130,16 +130,18 @@ namespace ImageLib
                     if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
                         ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
                     {
-                        // Async saving to the storage cache without await
-                        var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
-                            .ContinueWith(task =>
-                                {
-                                    if (task.IsFaulted || !task.Result)
-                                    {
-                                        Log("[error] failed to save in storage: " + imageUri);
-                                    }
-                                }
-                        );
+                        await Task.Factory.StartNew(() =>
+                          {
+                            // Async saving to the storage cache without await
+                            var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
+                              .ContinueWith(task =>
+                                  {
+                                      if (task.IsFaulted || !task.Result)
+                                      {
+                                          Log("[error] failed to save in storage: " + imageUri);
+                                      }
+                                  }
+                          );});
                     }
                 }
 
