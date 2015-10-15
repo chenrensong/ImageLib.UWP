@@ -15,7 +15,8 @@ namespace ImageLib.Cache.Storage.CacheImpl
         /// <summary>
         /// Dictionary contains pairs of filePath and last access time in unix timestamp * 1000 (DateTime.Millisecond)
         /// </summary>
-        private readonly IDictionary<string, long> _lastAccessTimeDictionary = new SynchronizedDictionary<string, long>();
+        private readonly IDictionary<string, long> _lastAccessTimeDictionary =
+            new SynchronizedDictionary<string, long>();
 
         private readonly object _lockObject = new object();
 
@@ -86,18 +87,13 @@ namespace ImageLib.Cache.Storage.CacheImpl
         {
             Task.Factory.StartNew(async () =>
             {
-                // Pattern to match all innerFiles and innerDirectories inside absoluteDirPath
-                var filesAndDirectoriesPattern = CacheDirectory + @"\*";
-
                 IReadOnlyList<StorageFile> cacheFiles;
-
                 try
                 {
-                    var path = Path.Combine(CacheDirectory, filesAndDirectoriesPattern);
-                    var storageFolder = await ISF.GetFolderAsync(path);
+                    var storageFolder = await SF.GetFolderAsync(CacheDirectory);
                     cacheFiles = await storageFolder.GetFilesAsync();
                 }
-                catch
+                catch (Exception ex)
                 {
                     return;
                 }
@@ -107,13 +103,12 @@ namespace ImageLib.Cache.Storage.CacheImpl
                 foreach (var cacheFile in cacheFiles)
                 {
                     var properties = await cacheFile.GetBasicPropertiesAsync();
-                    var fullCacheFilePath = cacheFile.Path;
+                    var fullCacheFilePath = cacheFile.Name;
                     try
                     {
                         cacheSizeInBytes += (long)properties.Size;
 
-                        _lastAccessTimeDictionary.Add(fullCacheFilePath, DateTimeHelper.
-                            ConvertDateTimeToMillis(properties.DateModified.DateTime));
+                        _lastAccessTimeDictionary.Add(fullCacheFilePath, properties.DateModified.DateTime.Milliseconds());
                     }
                     catch
                     {
@@ -135,10 +130,12 @@ namespace ImageLib.Cache.Storage.CacheImpl
 
             if (string.IsNullOrEmpty(oldestCacheFilePath)) return false;
 
+            oldestCacheFilePath = Path.Combine(CacheDirectory, oldestCacheFilePath);
+
             try
             {
                 long fileSizeInBytes;
-                var storageFile = await ISF.GetFileAsync(oldestCacheFilePath);
+                var storageFile = await SF.GetFileAsync(oldestCacheFilePath);
                 var properties = await storageFile.GetBasicPropertiesAsync();
                 fileSizeInBytes = (long)properties.Size;
 
@@ -156,7 +153,7 @@ namespace ImageLib.Cache.Storage.CacheImpl
                     ImageLoader.Log("[error] can not delete oldest cache file: " + oldestCacheFilePath);
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 ImageLoader.Log("[error] can not get olders cache's file size: " + oldestCacheFilePath);
             }

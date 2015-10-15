@@ -481,7 +481,6 @@ namespace ImageLib.Gif
                         {
                             delayMilliseconds = 100.0d;
                         }
-                        Debug.WriteLine(delayMilliseconds);
                     }
                 }
 

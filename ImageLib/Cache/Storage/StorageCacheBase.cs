@@ -17,9 +17,9 @@ namespace ImageLib.Cache.Storage
         protected const long DefaultCacheMaxLifetimeInMillis = 7 * 24 * 60 * 60 * 1000; // == 604800000;
 
         /// <summary>
-        /// StorageFolder instance to work with app's ISF
+        /// StorageFolder instance to work with app's SF
         /// </summary>
-        protected readonly StorageFolder ISF;
+        protected readonly StorageFolder SF;
 
         /// <summary>
         /// Base cache directory where all cache will be saved
@@ -37,9 +37,9 @@ namespace ImageLib.Cache.Storage
         /// </summary>
         protected virtual long CacheMaxLifetimeInMillis { get; set; }
 
-        protected StorageCacheBase(StorageFolder isf, string cacheDirectory, ICacheGenerator cacheFileNameGenerator, long cacheMaxLifetimeInMillis = DefaultCacheMaxLifetimeInMillis)
+        protected StorageCacheBase(StorageFolder sf, string cacheDirectory, ICacheGenerator cacheFileNameGenerator, long cacheMaxLifetimeInMillis = DefaultCacheMaxLifetimeInMillis)
         {
-            if (isf == null)
+            if (sf == null)
             {
                 throw new ArgumentNullException("isf");
             }
@@ -49,23 +49,23 @@ namespace ImageLib.Cache.Storage
                 throw new ArgumentException("cacheDirectory name could not be null or empty");
             }
 
-            //if (!cacheDirectory.StartsWith("\\"))
-            //{
-            //    throw new ArgumentException("cacheDirectory name should starts with double slashes: \\");
-            //}
+            if (cacheDirectory.StartsWith("\\"))
+            {
+                throw new ArgumentException("cacheDirectory name shouldn't starts with double slashes: \\");
+            }
 
             if (cacheFileNameGenerator == null)
             {
                 throw new ArgumentNullException("cacheFileNameGenerator");
             }
 
-            ISF = isf;
+            SF = sf;
             CacheDirectory = cacheDirectory;
             CacheFileNameGenerator = cacheFileNameGenerator;
             CacheMaxLifetimeInMillis = cacheMaxLifetimeInMillis;
 
             // Creating cache directory if it not exists
-            ISF.CreateFolderAsync(CacheDirectory).AsTask();
+            SF.CreateFolderAsync(CacheDirectory).AsTask();
         }
 
         /// <summary>
@@ -87,8 +87,7 @@ namespace ImageLib.Cache.Storage
         /// <returns>true if file was successfully written, false otherwise</returns>
         protected async virtual Task<bool> InternalSaveAsync(string fullFilePath, IRandomAccessStream cacheStream)
         {
-            var storageFile = await ISF.CreateFileAsync(fullFilePath, CreationCollisionOption.ReplaceExisting);
-
+            var storageFile = await SF.CreateFileAsync(fullFilePath, CreationCollisionOption.ReplaceExisting);
             using (IRandomAccessStream outputStream = await storageFile.OpenAsync(FileAccessMode.ReadWrite))
             {
                 try
@@ -122,12 +121,10 @@ namespace ImageLib.Cache.Storage
         public async virtual Task<IRandomAccessStream> LoadCacheStreamAsync(string cacheKey)
         {
             var fullFilePath = GetFullFilePath(CacheFileNameGenerator.GenerateCacheName(cacheKey));
-
             try
             {
                 var cacheFileMemoryStream = new InMemoryRandomAccessStream();
-                var storageFile = await ISF.GetFileAsync(fullFilePath);
-             
+                var storageFile = await SF.GetFileAsync(fullFilePath);
                 using (var cacheFileStream = await storageFile.OpenAsync(FileAccessMode.Read))
                 {
                     await RandomAccessStream.CopyAsync(
@@ -161,10 +158,9 @@ namespace ImageLib.Cache.Storage
         public virtual async Task<bool> IsCacheExists(string cacheKey)
         {
             var fullFilePath = GetFullFilePath(CacheFileNameGenerator.GenerateCacheName(cacheKey));
-
             try
             {
-                await ISF.GetFileAsync(fullFilePath);
+                await SF.GetFileAsync(fullFilePath);
                 return true;
             }
             catch
@@ -182,10 +178,9 @@ namespace ImageLib.Cache.Storage
         public virtual async Task<bool> IsCacheExistsAndAlive(string cacheKey)
         {
             var fullFilePath = GetFullFilePath(CacheFileNameGenerator.GenerateCacheName(cacheKey));
-
             try
             {
-                var storageFile = await ISF.GetFileAsync(fullFilePath);
+                var storageFile = await SF.GetFileAsync(fullFilePath);
                 return CacheMaxLifetimeInMillis <= 0 ? true :
                     ((DateTime.Now - storageFile.DateCreated.DateTime).TotalMilliseconds < CacheMaxLifetimeInMillis);
             }
@@ -211,8 +206,7 @@ namespace ImageLib.Cache.Storage
         /// <param name="absoluteDirPath">Path of the dir, which content you want to delete</param>
         protected virtual async Task DeleteDirContent(string absoluteDirPath)
         {
-            var filesAndDirectoriesPattern = absoluteDirPath + @"\*";
-            var storageFolder = await ISF.GetFolderAsync(filesAndDirectoriesPattern);
+            var storageFolder = await SF.GetFolderAsync(absoluteDirPath);
             await DeleteFolderContentsAsync(storageFolder);
         }
 

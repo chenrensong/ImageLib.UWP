@@ -2,7 +2,7 @@
 
 namespace ImageLib.Helpers
 {
-    internal class DateTimeHelper
+    internal static class DateTimeHelper
     {
         private static readonly DateTime zeroDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -12,10 +12,10 @@ namespace ImageLib.Helpers
         /// <returns></returns>
         public static long CurrentTimeMillis()
         {
-            return ConvertDateTimeToMillis(DateTime.Now);
+            return DateTime.Now.Milliseconds();
         }
 
-        public static long ConvertDateTimeToMillis(DateTime dateTime)
+        public static long Milliseconds(this DateTime dateTime)
         {
             return (long)(dateTime - zeroDateTime).TotalMilliseconds;
         }

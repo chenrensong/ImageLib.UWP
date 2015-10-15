@@ -151,7 +151,7 @@ namespace ImageLib.Controls
                                             //              randStream.GetInputStreamAt(0L),
                                             //              inMemoryStream.GetOutputStreamAt(0L));
                                             //await copyAction.AsTask(cancellationTokenSource.Token);
-            //debug模式不允许Decoders,直接采用默认方案
+                                            //debug模式不允许Decoders,直接采用默认方案
             if (!DesignMode.DesignModeEnabled)
             {
                 var decoders = ImageConfig.GetAvailableDecoders();
@@ -172,6 +172,10 @@ namespace ImageLib.Controls
                                 cancellationTokenSource);
                             if (!cancellationTokenSource.IsCancellationRequested)
                             {
+                                if (_imageDecoder != null)
+                                {
+                                    _imageDecoder.Dispose();
+                                }
                                 Interlocked.Exchange(ref _imageDecoder, decoder);
                                 //ImageDecoders.Add(new WeakReference<IImageDecoder>(_imageDecoder));
                                 if (_isControlLoaded)

@@ -13,9 +13,6 @@ namespace ImageLib
 {
     public class ImageLoader
     {
-        /// <summary>
-        /// Used for log output as first symbols
-        /// </summary>
         private const string TAG = "[ImageLoader]";
 
         private static readonly object LockObject = new object();
@@ -42,7 +39,6 @@ namespace ImageLib
         protected ImageLoader()
         {
         }
-
 
 
         protected virtual void CheckConfig()
@@ -122,7 +118,10 @@ namespace ImageLib
                     if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
                         ImageConfig.Config.CacheMode == CacheMode.OnlyMemoryCache)
                     {
-                        ImageConfig.Config.MemoryCacheImpl.Put(imageUrl, randStream);
+                        if (randStream != null)
+                        {
+                            ImageConfig.Config.MemoryCacheImpl.Put(imageUrl, randStream);
+                        }
                     }
 
                     //是http or https

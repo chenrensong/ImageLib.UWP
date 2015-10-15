@@ -38,8 +38,7 @@ namespace Demo
                 CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
                 IsLogEnabled = true,
                 MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
-                StorageCacheImpl =
-                new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
+                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().Build());
         }
