@@ -16,10 +16,10 @@
 ## XAML代码
 ``` xaml
  <controls:ImageView 
-                Margin="0,20"
-                UriSource="ms-appx:///Images/2.gif"
-                Stretch="None"
-               />
+            Margin="0,20"
+            UriSource="ms-appx:///Images/2.gif"
+            Stretch="None"
+             />
 ```
 
 ##支持URI格式
