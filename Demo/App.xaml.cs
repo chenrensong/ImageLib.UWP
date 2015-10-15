@@ -1,8 +1,13 @@
 ﻿using ImageLib;
+using ImageLib.Cache.Memory.CacheImpl;
+using ImageLib.Cache.Storage;
+using ImageLib.Cache.Storage.CacheImpl;
 using ImageLib.Gif;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -26,10 +31,17 @@ namespace Demo
         /// </summary>
         public App()
         {
-
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            ImageLib.IO.Decoders.AddDecoder<GifDecoder>();
+            ImageConfig.Initialize(new ImageConfig.Builder()
+            {
+                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
+                IsLogEnabled = true,
+                MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
+                StorageCacheImpl =
+                new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
+                "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+            }.AddDecoder<GifDecoder>().Build());
         }
 
         /// <summary>

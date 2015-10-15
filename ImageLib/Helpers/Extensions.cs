@@ -80,9 +80,14 @@ namespace ImageLib.Helpers
             return result;
         }
 
+        public static bool IsWeb(this Uri uri)
+        {
+            return uri.Scheme == "http" || uri.Scheme == "https";
+        }
 
         public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
         {
+
             //Contract.Requires<ArgumentNullException>(uri == null, "Uri cannot be null.");
             switch (uri.Scheme)
             {
