@@ -8,7 +8,7 @@
     mc:Ignorable="d">
     <ScrollViewer Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel Margin="10">
-            <Button Content="sss" Click="Button_Click"/>
+            <Button Content="返回" Click="Button_Click"/>
             <TextBlock
 				TextWrapping="Wrap"
 				Text="Set the UriSource property of ImageView to an http:, https:, ms-appx: or ms-appdata: URI to display a jpg、png、gif.... " />

@@ -41,6 +41,7 @@ namespace ImageLib.IO
         /// 执行播放(动态图片)
         /// </summary>
         void Start();
+
         /// <summary>
         /// 执行停止(动态图片)
         /// </summary>
@@ -58,7 +59,8 @@ namespace ImageLib.IO
         /// <param name="dispatcher">用于UI线程绘制</param>
         /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
+        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher,
+            IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
 
     }
 }

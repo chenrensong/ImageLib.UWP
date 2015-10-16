@@ -106,8 +106,6 @@ namespace ImageLib
                 return this;
             }
 
-
-
             public ImageConfig Build()
             {
                 CheckParams();

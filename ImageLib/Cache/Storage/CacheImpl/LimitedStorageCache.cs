@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -107,12 +106,11 @@ namespace ImageLib.Cache.Storage.CacheImpl
                     try
                     {
                         cacheSizeInBytes += (long)properties.Size;
-
                         _lastAccessTimeDictionary.Add(fullCacheFilePath, properties.DateModified.DateTime.Milliseconds());
                     }
                     catch
                     {
-                        ImageLoader.Log("[error] can not get cache's file size: " + fullCacheFilePath);
+                        ImageLog.Log("[error] can not get cache's file size: " + fullCacheFilePath);
                     }
                 }
                 CurrentCacheSizeInBytes += cacheSizeInBytes; // Updating current cache size
@@ -144,18 +142,17 @@ namespace ImageLib.Cache.Storage.CacheImpl
                     await storageFile.DeleteAsync();
                     _lastAccessTimeDictionary.Remove(oldestCacheFilePath);
                     CurrentCacheSizeInBytes -= fileSizeInBytes; // Updating current cache size
-
-                    ImageLoader.Log("[delete] cache file " + oldestCacheFilePath);
+                    ImageLog.Log("[delete] cache file " + oldestCacheFilePath);
                     return true;
                 }
                 catch
                 {
-                    ImageLoader.Log("[error] can not delete oldest cache file: " + oldestCacheFilePath);
+                    ImageLog.Log("[error] can not delete oldest cache file: " + oldestCacheFilePath);
                 }
             }
             catch (Exception ex)
             {
-                ImageLoader.Log("[error] can not get olders cache's file size: " + oldestCacheFilePath);
+                ImageLog.Log("[error] can not get olders cache's file size: " + oldestCacheFilePath);
             }
 
             return false;

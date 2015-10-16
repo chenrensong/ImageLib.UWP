@@ -39,7 +39,7 @@ namespace Demo
                 IsLogEnabled = true,
                 MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-                "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+                "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().Build());
         }
 
@@ -75,7 +75,7 @@ namespace Demo
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(BlankPage1), e.Arguments);
+                rootFrame.Navigate(typeof(DemoPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();

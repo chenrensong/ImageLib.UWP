@@ -144,14 +144,15 @@ namespace ImageLib.Controls
             var randStream = await ImageLoader.Instance.LoadImageStream(uriSource, cancellationTokenSource);
             ImageSource imageSource = null;
             bool hasDecoder = false;
-            var inMemoryStream = randStream;// new InMemoryRandomAccessStream();
-                                            //using (inMemoryStream)
-                                            //{
-                                            //var copyAction = RandomAccessStream.CopyAndCloseAsync(
-                                            //              randStream.GetInputStreamAt(0L),
-                                            //              inMemoryStream.GetOutputStreamAt(0L));
-                                            //await copyAction.AsTask(cancellationTokenSource.Token);
-                                            //debug模式不允许Decoders,直接采用默认方案
+            //var inMemoryStream = randStream;// new InMemoryRandomAccessStream();
+            //using (inMemoryStream)
+            //{
+            //var copyAction = RandomAccessStream.CopyAndCloseAsync(
+            //              randStream.GetInputStreamAt(0L),
+            //              inMemoryStream.GetOutputStreamAt(0L));
+            //await copyAction.AsTask(cancellationTokenSource.Token);
+            var inMemoryStream = randStream;
+            //debug模式不允许Decoders,直接采用默认方案
             if (!DesignMode.DesignModeEnabled)
             {
                 var decoders = ImageConfig.GetAvailableDecoders();
@@ -194,7 +195,6 @@ namespace ImageLib.Controls
                 await bitmapImage.SetSourceAsync(inMemoryStream).AsTask(cancellationTokenSource.Token);
                 imageSource = bitmapImage;
             }
-            //}
             return imageSource;
         }
 

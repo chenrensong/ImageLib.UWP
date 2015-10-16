@@ -13,7 +13,6 @@ namespace ImageLib
 {
     public class ImageLoader
     {
-        private const string TAG = "[ImageLoader]";
 
         private static readonly object LockObject = new object();
 
@@ -35,11 +34,9 @@ namespace ImageLib
             }
         }
 
-
         protected ImageLoader()
         {
         }
-
 
         protected virtual void CheckConfig()
         {
@@ -81,14 +78,11 @@ namespace ImageLib
             CancellationTokenSource cancellationTokenSource)
         {
             CheckConfig();
-
             if (imageUri == null)
             {
                 return null;
             }
-
             var imageUrl = imageUri.AbsoluteUri;
-
             //有Cache情况，先加载Cache
             if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
             {
@@ -103,15 +97,24 @@ namespace ImageLib
 
             try
             {
-                Log("[network] loading " + imageUrl);
+                ImageLog.Log("[network] loading " + imageUrl);
                 var randStream = await imageUri.GetStreamFromUri(cancellationTokenSource.Token);
                 if (randStream == null)
                 {
-                    Log("[error] failed to download: " + imageUrl);
+                    ImageLog.Log("[error] failed to download: " + imageUrl);
                     return null;
                 }
+                var inMemoryStream = new InMemoryRandomAccessStream();
+                using (randStream)
+                {
+                    var copyAction = RandomAccessStream.CopyAndCloseAsync(
+                              randStream.GetInputStreamAt(0L),
+                              inMemoryStream.GetOutputStreamAt(0L));
+                    await copyAction.AsTask(cancellationTokenSource.Token);
+                }
+                randStream = inMemoryStream;
 
-                Log("[network] loaded " + imageUrl);
+                ImageLog.Log("[network] loaded " + imageUrl);
 
                 if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
                 {
@@ -124,24 +127,28 @@ namespace ImageLib
                         }
                     }
 
-                    //是http or https
-                    //if (imageUri.IsWeb())
-                    //{
+
+
                     if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
-                        ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
+                    ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
                     {
-                        await Task.Factory.StartNew(() =>
-                          {
-                            // Async saving to the storage cache without await
-                            var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
-                              .ContinueWith(task =>
-                                  {
-                                      if (task.IsFaulted || !task.Result)
-                                      {
-                                          Log("[error] failed to save in storage: " + imageUri);
-                                      }
-                                  }
-                          );});
+                        //是http or https 才加入本地缓存
+                        if (imageUri.IsWeb())
+                        {
+                            await Task.Factory.StartNew(() =>
+                              {
+                                  // Async saving to the storage cache without await
+                                  var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
+                                        .ContinueWith(task =>
+                                            {
+                                                if (task.IsFaulted || !task.Result)
+                                                {
+                                                    ImageLog.Log("[error] failed to save in storage: " + imageUri);
+                                                }
+                                            }
+                                    );
+                              });
+                        }
                     }
                 }
 
@@ -149,7 +156,7 @@ namespace ImageLib
             }
             catch
             {
-                Log("[error] failed to save loaded image: " + imageUrl);
+                ImageLog.Log("[error] failed to save loaded image: " + imageUrl);
             }
 
             // May be another thread has saved image to the cache
@@ -163,7 +170,7 @@ namespace ImageLib
                 }
             }
 
-            Log("[error] failed to load image stream from cache and network: " + imageUrl);
+            ImageLog.Log("[error] failed to load image stream from cache and network: " + imageUrl);
             return null;
         }
 
@@ -178,10 +185,9 @@ namespace ImageLib
                 ImageConfig.Config.CacheMode == CacheMode.OnlyMemoryCache)
             {
                 IRandomAccessStream memoryStream;
-
                 if (ImageConfig.Config.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
                 {
-                    Log("[memory] " + imageUrl);
+                    ImageLog.Log("[memory] " + imageUrl);
                     return memoryStream;
                 }
             }
@@ -191,7 +197,7 @@ namespace ImageLib
             {
                 if (await ImageConfig.Config.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
-                    Log("[storage] " + imageUrl);
+                    ImageLog.Log("[storage] " + imageUrl);
                     var storageStream = await ImageConfig.Config.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
                     // Moving cache to the memory
                     if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache
@@ -206,16 +212,6 @@ namespace ImageLib
             return null;
         }
 
-        /// <summary>
-        /// Outputs log messages if IsLogEnabled
-        /// </summary>
-        /// <param name="message">to output</param>
-        internal static void Log(string message)
-        {
-            if (Instance != null && ImageConfig.Config.IsLogEnabled)
-            {
-                Debug.WriteLine("{0} {1}", TAG, message);
-            }
-        }
+
     }
 }

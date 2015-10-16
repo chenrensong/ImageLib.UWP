@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="Demo.BlankPage1"
+    x:Class="Demo.DemoPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Demo"
@@ -8,7 +8,8 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="126,232,0,0" VerticalAlignment="Top" Click="button_Click"/>
+        <Button x:Name="button" Content="点击查看Demo" HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch" Click="button_Click"/>
 
     </Grid>
 </Page>

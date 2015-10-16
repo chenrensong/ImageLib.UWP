@@ -43,27 +43,22 @@ namespace ImageLib.Cache.Storage
             {
                 throw new ArgumentNullException("isf");
             }
-
             if (string.IsNullOrEmpty(cacheDirectory))
             {
                 throw new ArgumentException("cacheDirectory name could not be null or empty");
             }
-
             if (cacheDirectory.StartsWith("\\"))
             {
                 throw new ArgumentException("cacheDirectory name shouldn't starts with double slashes: \\");
             }
-
             if (cacheFileNameGenerator == null)
             {
                 throw new ArgumentNullException("cacheFileNameGenerator");
             }
-
             SF = sf;
             CacheDirectory = cacheDirectory;
             CacheFileNameGenerator = cacheFileNameGenerator;
             CacheMaxLifetimeInMillis = cacheMaxLifetimeInMillis;
-
             // Creating cache directory if it not exists
             SF.CreateFolderAsync(CacheDirectory).AsTask();
         }
@@ -95,6 +90,7 @@ namespace ImageLib.Cache.Storage
                     await RandomAccessStream.CopyAsync(
                         cacheStream.GetInputStreamAt(0L),
                         outputStream.GetOutputStreamAt(0L));
+                    return true;
                 }
                 catch
                 {
@@ -105,11 +101,11 @@ namespace ImageLib.Cache.Storage
                     }
                     catch
                     {
-                        ImageLoader.Log("[error] can not delete unsaved file: " + fullFilePath);
+                        ImageLog.Log("[error] can not delete unsaved file: " + fullFilePath);
                     }
                 }
             }
-            ImageLoader.Log("[error] can not save cache to the: " + fullFilePath);
+            ImageLog.Log("[error] can not save cache to the: " + fullFilePath);
             return false;
         }
 
@@ -135,7 +131,7 @@ namespace ImageLib.Cache.Storage
             }
             catch (Exception ex)
             {
-                ImageLoader.Log("[error] can not load file stream from: " + fullFilePath);
+                ImageLog.Log("[error] can not load file stream from: " + fullFilePath);
                 return null;
             }
         }
@@ -165,7 +161,7 @@ namespace ImageLib.Cache.Storage
             }
             catch
             {
-                ImageLoader.Log("[error] can not check cache existence, file: " + fullFilePath);
+                ImageLog.Log("[error] can not check cache existence, file: " + fullFilePath);
                 return false;
             }
         }
@@ -186,9 +182,8 @@ namespace ImageLib.Cache.Storage
             }
             catch
             {
-                ImageLoader.Log("[error] can not check is cache exists and alive, file: " + fullFilePath);
+                ImageLog.Log("[error] can not check is cache exists and alive, file: " + fullFilePath);
             }
-
             return false;
         }
 

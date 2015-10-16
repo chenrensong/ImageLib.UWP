@@ -26,10 +26,6 @@ namespace ImageLib.Helpers
     /// </summary>
     public static class Extensions
     {
-        /// <summary>
-        /// Defines a constant rectangle where all values are zero.
-        /// </summary>
-        public static readonly Rect ZeroRect = new Rect(0, 0, 0, 0);
 
         /// <summary>
         /// Converts byte array to a new array where each value in the original array is represented 
@@ -51,11 +47,9 @@ namespace ImageLib.Helpers
             if (bits < 8)
             {
                 result = new byte[bytes.Length * 8 / bits];
-
                 int factor = (int)Math.Pow(2, bits) - 1;
                 int mask = (0xFF >> (8 - bits));
                 int resultOffset = 0;
-
                 for (int i = 0; i < bytes.Length; i++)
                 {
                     for (int shift = 0; shift < 8; shift += bits)
@@ -82,7 +76,7 @@ namespace ImageLib.Helpers
 
         public static bool IsWeb(this Uri uri)
         {
-            return uri.Scheme == "http" || uri.Scheme == "https";
+            return "http".Equals(uri.Scheme) || "https".Equals(uri.Scheme);
         }
 
         public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
@@ -123,24 +117,6 @@ namespace ImageLib.Helpers
         }
 
 
-
-
-        /// <summary>
-        /// Multiplies the values of the specified rectangle by the factor.
-        /// </summary>
-        /// <param name="rectangle">The rectangle to multiply with the factor.</param>
-        /// <param name="factor">The factor.</param>
-        /// <returns>The new rectangle.</returns>
-        public static Rectangle Multiply(Rectangle rectangle, double factor)
-        {
-            rectangle.X = (int)(rectangle.X * factor);
-            rectangle.Y = (int)(rectangle.Y * factor);
-
-            rectangle.Width = (int)(rectangle.Width * factor);
-            rectangle.Height = (int)(rectangle.Height * factor);
-
-            return rectangle;
-        }
 
         /// <summary>
         /// Multiplies the values of the specified rectangle by the factor.
@@ -304,7 +280,6 @@ namespace ImageLib.Helpers
         public static TValue RemainBetween<TValue>(this TValue value, TValue low, TValue high) where TValue : IComparable
         {
             TValue result = value;
-
             if (Comparer<TValue>.Default.Compare(high, low) < 0)
             {
                 result = low;
@@ -332,7 +307,6 @@ namespace ImageLib.Helpers
         public static void Swap<TRef>(ref TRef lhs, ref TRef rhs) where TRef : class
         {
             TRef tmp = lhs;
-
             lhs = rhs;
             rhs = tmp;
         }
