@@ -7,9 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Button x:Name="button" Content="点击查看Demo" HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch" Click="button_Click"/>
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button Content="点击查看Demo" HorizontalAlignment="Stretch" 
+                VerticalAlignment="Top" Click="button_Click"/>
 
-    </Grid>
+        <Button Content="回收内存" HorizontalAlignment="Stretch" 
+                VerticalAlignment="Top" Click="Button_Click_1"/>
+
+    </StackPanel>
 </Page>

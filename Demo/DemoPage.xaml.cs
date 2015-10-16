@@ -32,5 +32,10 @@ namespace Demo
             this.Frame.Navigate(typeof(MainPage));
 
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            GC.Collect();
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace ImageLib
             if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
             {
                 //加载Cache
-                var resultFromCache = await LoadImageStreamFromCache(imageUrl);
+                var resultFromCache = await LoadImageStreamFromCache(imageUri);
 
                 if (resultFromCache != null)
                 {
@@ -163,7 +163,7 @@ namespace ImageLib
             // It is real working case
             if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
             {
-                var resultFromCache = await LoadImageStreamFromCache(imageUrl);
+                var resultFromCache = await LoadImageStreamFromCache(imageUri);
                 if (resultFromCache != null)
                 {
                     return resultFromCache;
@@ -179,8 +179,9 @@ namespace ImageLib
         /// </summary>
         /// <param name="imageUrl"></param>
         /// <returns>Steam of the image or null if it was not found in cache</returns>
-        protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(string imageUrl)
+        protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
         {
+            var imageUrl = imageUri.AbsoluteUri;
             if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
                 ImageConfig.Config.CacheMode == CacheMode.OnlyMemoryCache)
             {
@@ -195,7 +196,8 @@ namespace ImageLib
             if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
                 ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
             {
-                if (await ImageConfig.Config.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
+                //网络uri且缓存可用
+                if (imageUri.IsWeb() && await ImageConfig.Config.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
                     ImageLog.Log("[storage] " + imageUrl);
                     var storageStream = await ImageConfig.Config.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
@@ -208,7 +210,6 @@ namespace ImageLib
                     return storageStream;
                 }
             }
-
             return null;
         }
 
