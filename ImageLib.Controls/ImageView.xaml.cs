@@ -17,16 +17,12 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using ImageLib.IO;
-using ImageLib.Helpers;
 using Windows.ApplicationModel;
-using Windows.Storage.Streams;
 
 namespace ImageLib.Controls
 {
     public sealed partial class ImageView : UserControl
     {
-        //private static List<WeakReference<IImageDecoder>> ImageDecoders =
-        //    new List<WeakReference<IImageDecoder>>();
 
         #region Public Events
         /// <summary>
@@ -140,18 +136,9 @@ namespace ImageLib.Controls
 
         private async Task<ImageSource> LoadImageByUri(Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
-            //var randStream = await uriSource.GetStreamFromUri(cancellationTokenSource.Token);
             var randStream = await ImageLoader.Instance.LoadImageStream(uriSource, cancellationTokenSource);
             ImageSource imageSource = null;
             bool hasDecoder = false;
-            //var inMemoryStream = randStream;// new InMemoryRandomAccessStream();
-            //using (inMemoryStream)
-            //{
-            //var copyAction = RandomAccessStream.CopyAndCloseAsync(
-            //              randStream.GetInputStreamAt(0L),
-            //              inMemoryStream.GetOutputStreamAt(0L));
-            //await copyAction.AsTask(cancellationTokenSource.Token);
-            var inMemoryStream = randStream;
             //debug模式不允许Decoders,直接采用默认方案
             if (!DesignMode.DesignModeEnabled)
             {
@@ -162,14 +149,14 @@ namespace ImageLib.Controls
                     if (maxHeaderSize > 0)
                     {
                         byte[] header = new byte[maxHeaderSize];
-                        var readStream = inMemoryStream.AsStreamForRead();
+                        var readStream = randStream.AsStreamForRead();
                         readStream.Position = 0;
                         await readStream.ReadAsync(header, 0, maxHeaderSize);
                         readStream.Position = 0;
                         var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
                         if (decoder != null)
                         {
-                            imageSource = await decoder.InitializeAsync(this.Dispatcher, inMemoryStream,
+                            imageSource = await decoder.InitializeAsync(this.Dispatcher, randStream,
                                 cancellationTokenSource);
                             if (!cancellationTokenSource.IsCancellationRequested)
                             {
@@ -178,7 +165,6 @@ namespace ImageLib.Controls
                                     _imageDecoder.Dispose();
                                 }
                                 Interlocked.Exchange(ref _imageDecoder, decoder);
-                                //ImageDecoders.Add(new WeakReference<IImageDecoder>(_imageDecoder));
                                 if (_isControlLoaded)
                                 {
                                     _imageDecoder.Start();
@@ -192,7 +178,7 @@ namespace ImageLib.Controls
             if (!hasDecoder)
             {
                 var bitmapImage = new BitmapImage();
-                await bitmapImage.SetSourceAsync(inMemoryStream).AsTask(cancellationTokenSource.Token);
+                await bitmapImage.SetSourceAsync(randStream).AsTask(cancellationTokenSource.Token);
                 imageSource = bitmapImage;
             }
             return imageSource;
@@ -275,14 +261,6 @@ namespace ImageLib.Controls
         public void Start()
         {
             _imageDecoder?.Start();
-        }
-
-        public void Dispose()
-        {
-            _imageDecoder?.Dispose();
-            _initializationCancellationTokenSource?.Cancel();
-            _image.Source = null;
-            _imageDecoder = null;
         }
 
         #endregion
