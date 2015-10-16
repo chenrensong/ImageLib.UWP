@@ -128,7 +128,6 @@ namespace ImageLib
                     }
 
 
-
                     if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
                     ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
                     {
