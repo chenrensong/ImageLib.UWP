@@ -1,5 +1,5 @@
 # ImageLib.UWP
-  支持Universal Windows Platform(UWP)，基于微软最新的2d图形加速引擎**Win2d**，支持gif、jpg、png等格式。
+  支持Universal Windows Platform(UWP)，基于微软最新的2d图形加速引擎**Win2d**，支持gif、jpg、png、webp等格式。
   同时支持实现[IImageDecoder](https://github.com/chenrensong/ImageLib.UWP/blob/master/ImageLib/IO/IImageDecoder.cs)接口来支持更多图片格式。
  
 ## 初始化
@@ -10,8 +10,8 @@
               IsLogEnabled = true,
               MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
               StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-              "test", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-          }.AddDecoder<GifDecoder>().Build());
+              "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+          }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
 ```
 ## XAML代码
 ``` xaml
@@ -22,7 +22,7 @@
 ```
 
 ##支持URI格式
-  http:, https:, ms-appx:,ms-appdata:
+  http:, https:, ms-appx:,ms-appdata:,ms-resource;
 ##支持平台
   **Client:** Windows 10
   
