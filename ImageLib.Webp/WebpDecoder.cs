@@ -1,14 +1,18 @@
-﻿using ImageLib.IO;
+﻿// ===============================================================================
+// WebpDecoder.cs
+// ImageLib for UWP
+// ===============================================================================
+// Copyright (c) 陈仁松. 
+// All rights reserved.
+// ===============================================================================
+
+using ImageLib.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
-using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using WebpLib;
 
