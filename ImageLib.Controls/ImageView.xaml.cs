@@ -250,7 +250,11 @@ namespace ImageLib.Controls
 
         private void OnSurfaceContentsLost(object sender, object e)
         {
-            _image.Source = _imageDecoder?.RecreateSurfaces();
+            var source = _imageDecoder?.RecreateSurfaces();
+            if (source != null)
+            {
+                _image.Source = source;
+            }
         }
 
         public void Stop()

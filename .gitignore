@@ -7,15 +7,22 @@ Desktop.ini
 
 obj/
 bin/
+Debug/
+Release/
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+
+
+*.sdf
+*.opensdf
 
 # Windows Installer files
 *.cab
 *.msi
 *.msm
 *.msp
+
 
 # Windows shortcuts
 *.lnk

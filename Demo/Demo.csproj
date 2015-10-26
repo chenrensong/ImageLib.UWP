@@ -149,9 +149,17 @@
       <Project>{248a9a1c-18a7-4101-9ebf-cfe1fc23a1b0}</Project>
       <Name>ImageLib.Gif</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ImageLib.Webp\ImageLib.Webp.csproj">
+      <Project>{27dfb1c8-3bb4-4440-a94b-6499440e4327}</Project>
+      <Name>ImageLib.Webp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ImageLib\ImageLib.csproj">
       <Project>{13258fbc-ed4a-476c-a0f3-bccf82177476}</Project>
       <Name>ImageLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebpLib\WebpLib.vcxproj">
+      <Project>{45131605-318b-4f6d-bb6e-7b36f2f94d65}</Project>
+      <Name>WebpLib</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

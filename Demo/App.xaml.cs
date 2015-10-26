@@ -3,6 +3,7 @@ using ImageLib.Cache.Memory.CacheImpl;
 using ImageLib.Cache.Storage;
 using ImageLib.Cache.Storage.CacheImpl;
 using ImageLib.Gif;
+using ImageLib.Webp;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -40,7 +41,7 @@ namespace Demo
                 MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().Build());
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
         }
 
         /// <summary>
