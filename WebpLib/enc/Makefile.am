@@ -1,4 +1,3 @@
-AM_CPPFLAGS = -I$(top_srcdir)/src
 noinst_LTLIBRARIES = libwebpencode.la
 
 libwebpencode_la_SOURCES =
@@ -12,8 +11,11 @@ libwebpencode_la_SOURCES += filter.c
 libwebpencode_la_SOURCES += frame.c
 libwebpencode_la_SOURCES += histogram.c
 libwebpencode_la_SOURCES += iterator.c
-libwebpencode_la_SOURCES += layer.c
 libwebpencode_la_SOURCES += picture.c
+libwebpencode_la_SOURCES += picture_csp.c
+libwebpencode_la_SOURCES += picture_psnr.c
+libwebpencode_la_SOURCES += picture_rescale.c
+libwebpencode_la_SOURCES += picture_tools.c
 libwebpencode_la_SOURCES += quant.c
 libwebpencode_la_SOURCES += syntax.c
 libwebpencode_la_SOURCES += token.c

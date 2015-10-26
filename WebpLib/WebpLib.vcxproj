@@ -216,7 +216,9 @@
     <ClInclude Include="dec\webpi.h" />
     <ClInclude Include="dsp\dsp.h" />
     <ClInclude Include="dsp\lossless.h" />
+    <ClInclude Include="dsp\neon.h" />
     <ClInclude Include="dsp\yuv.h" />
+    <ClInclude Include="dsp\yuv_tables_sse2.h" />
     <ClInclude Include="enc\backward_references.h" />
     <ClInclude Include="enc\cost.h" />
     <ClInclude Include="enc\histogram.h" />
@@ -224,7 +226,6 @@
     <ClInclude Include="enc\vp8li.h" />
     <ClInclude Include="mux\muxi.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="utils\alpha_processing.h" />
     <ClInclude Include="utils\bit_reader.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\color_cache.h" />
@@ -252,25 +253,35 @@
     <ClCompile Include="dec\frame.cpp" />
     <ClCompile Include="dec\idec.cpp" />
     <ClCompile Include="dec\io.cpp" />
-    <ClCompile Include="dec\layer.cpp" />
     <ClCompile Include="dec\quant.cpp" />
     <ClCompile Include="dec\tree.cpp" />
     <ClCompile Include="dec\vp8.cpp" />
     <ClCompile Include="dec\vp8l.cpp" />
     <ClCompile Include="dec\webp.cpp" />
     <ClCompile Include="demux\demux.cpp" />
+    <ClCompile Include="dsp\alpha_processing.cpp" />
+    <ClCompile Include="dsp\alpha_processing_sse2.cpp" />
     <ClCompile Include="dsp\cpu.cpp" />
     <ClCompile Include="dsp\dec.cpp" />
+    <ClCompile Include="dsp\dec_clip_tables.cpp" />
+    <ClCompile Include="dsp\dec_mips32.cpp" />
     <ClCompile Include="dsp\dec_neon.cpp" />
     <ClCompile Include="dsp\dec_sse2.cpp" />
     <ClCompile Include="dsp\enc.cpp" />
+    <ClCompile Include="dsp\enc_avx2.cpp" />
+    <ClCompile Include="dsp\enc_mips32.cpp" />
     <ClCompile Include="dsp\enc_neon.cpp" />
     <ClCompile Include="dsp\enc_sse2.cpp" />
     <ClCompile Include="dsp\lossless.cpp" />
+    <ClCompile Include="dsp\lossless_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_neon.cpp" />
+    <ClCompile Include="dsp\lossless_sse2.cpp" />
     <ClCompile Include="dsp\upsampling.cpp" />
     <ClCompile Include="dsp\upsampling_neon.cpp" />
     <ClCompile Include="dsp\upsampling_sse2.cpp" />
     <ClCompile Include="dsp\yuv.cpp" />
+    <ClCompile Include="dsp\yuv_mips32.cpp" />
+    <ClCompile Include="dsp\yuv_sse2.cpp" />
     <ClCompile Include="enc\alpha.cpp" />
     <ClCompile Include="enc\analysis.cpp" />
     <ClCompile Include="enc\backward_references.cpp" />
@@ -280,8 +291,11 @@
     <ClCompile Include="enc\frame.cpp" />
     <ClCompile Include="enc\histogram.cpp" />
     <ClCompile Include="enc\iterator.cpp" />
-    <ClCompile Include="enc\layer.cpp" />
     <ClCompile Include="enc\picture.cpp" />
+    <ClCompile Include="enc\picture_csp.cpp" />
+    <ClCompile Include="enc\picture_psnr.cpp" />
+    <ClCompile Include="enc\picture_rescale.cpp" />
+    <ClCompile Include="enc\picture_tools.cpp" />
     <ClCompile Include="enc\quant.cpp" />
     <ClCompile Include="enc\syntax.cpp" />
     <ClCompile Include="enc\token.cpp" />
@@ -299,7 +313,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="utils\alpha_processing.cpp" />
     <ClCompile Include="utils\bit_reader.cpp" />
     <ClCompile Include="utils\bit_writer.cpp" />
     <ClCompile Include="utils\color_cache.cpp" />
@@ -313,6 +326,9 @@
     <ClCompile Include="utils\thread.cpp" />
     <ClCompile Include="utils\utils.cpp" />
     <ClCompile Include="WebpCodec.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dsp\Makefile.am" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

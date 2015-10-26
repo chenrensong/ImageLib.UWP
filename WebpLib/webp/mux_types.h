@@ -31,7 +31,7 @@ typedef struct WebPData WebPData;
 
 // VP8X Feature Flags.
 typedef enum WebPFeatureFlags {
-	WEBPFEATURE_NOFLAG = 0,
+  NO_FLAG         = 0x00000000,
   FRAGMENTS_FLAG  = 0x00000001,
   ANIMATION_FLAG  = 0x00000002,
   XMP_FLAG        = 0x00000004,
@@ -64,7 +64,7 @@ struct WebPData {
 // Initializes the contents of the 'webp_data' object with default values.
 static WEBP_INLINE void WebPDataInit(WebPData* webp_data) {
   if (webp_data != NULL) {
-	memset(webp_data, 0, sizeof(*webp_data));
+    memset(webp_data, 0, sizeof(*webp_data));
   }
 }
 
@@ -72,8 +72,8 @@ static WEBP_INLINE void WebPDataInit(WebPData* webp_data) {
 // deallocate the object itself.
 static WEBP_INLINE void WebPDataClear(WebPData* webp_data) {
   if (webp_data != NULL) {
-	free((void*)webp_data->bytes);
-	WebPDataInit(webp_data);
+    free((void*)webp_data->bytes);
+    WebPDataInit(webp_data);
   }
 }
 
@@ -83,10 +83,10 @@ static WEBP_INLINE int WebPDataCopy(const WebPData* src, WebPData* dst) {
   if (src == NULL || dst == NULL) return 0;
   WebPDataInit(dst);
   if (src->bytes != NULL && src->size != 0) {
-	dst->bytes = (uint8_t*)malloc(src->size);
-	if (dst->bytes == NULL) return 0;
-	memcpy((void*)dst->bytes, src->bytes, src->size);
-	dst->size = src->size;
+    dst->bytes = (uint8_t*)malloc(src->size);
+    if (dst->bytes == NULL) return 0;
+    memcpy((void*)dst->bytes, src->bytes, src->size);
+    dst->size = src->size;
   }
   return 1;
 }

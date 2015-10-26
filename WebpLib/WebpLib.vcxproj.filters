@@ -13,7 +13,6 @@
     <ClCompile Include="dec\frame.cpp" />
     <ClCompile Include="dec\idec.cpp" />
     <ClCompile Include="dec\io.cpp" />
-    <ClCompile Include="dec\layer.cpp" />
     <ClCompile Include="dec\quant.cpp" />
     <ClCompile Include="dec\tree.cpp" />
     <ClCompile Include="dec\vp8.cpp" />
@@ -41,7 +40,6 @@
     <ClCompile Include="enc\frame.cpp" />
     <ClCompile Include="enc\histogram.cpp" />
     <ClCompile Include="enc\iterator.cpp" />
-    <ClCompile Include="enc\layer.cpp" />
     <ClCompile Include="enc\picture.cpp" />
     <ClCompile Include="enc\quant.cpp" />
     <ClCompile Include="enc\syntax.cpp" />
@@ -52,7 +50,6 @@
     <ClCompile Include="mux\muxedit.cpp" />
     <ClCompile Include="mux\muxinternal.cpp" />
     <ClCompile Include="mux\muxread.cpp" />
-    <ClCompile Include="utils\alpha_processing.cpp" />
     <ClCompile Include="utils\bit_reader.cpp" />
     <ClCompile Include="utils\bit_writer.cpp" />
     <ClCompile Include="utils\color_cache.cpp" />
@@ -66,6 +63,21 @@
     <ClCompile Include="utils\thread.cpp" />
     <ClCompile Include="utils\utils.cpp" />
     <ClCompile Include="WebpCodec.cpp" />
+    <ClCompile Include="dsp\alpha_processing.cpp" />
+    <ClCompile Include="dsp\alpha_processing_sse2.cpp" />
+    <ClCompile Include="dsp\dec_clip_tables.cpp" />
+    <ClCompile Include="dsp\dec_mips32.cpp" />
+    <ClCompile Include="dsp\enc_avx2.cpp" />
+    <ClCompile Include="dsp\enc_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_neon.cpp" />
+    <ClCompile Include="dsp\lossless_sse2.cpp" />
+    <ClCompile Include="dsp\yuv_mips32.cpp" />
+    <ClCompile Include="dsp\yuv_sse2.cpp" />
+    <ClCompile Include="enc\picture_csp.cpp" />
+    <ClCompile Include="enc\picture_psnr.cpp" />
+    <ClCompile Include="enc\picture_rescale.cpp" />
+    <ClCompile Include="enc\picture_tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -84,7 +96,6 @@
     <ClInclude Include="enc\vp8enci.h" />
     <ClInclude Include="enc\vp8li.h" />
     <ClInclude Include="mux\muxi.h" />
-    <ClInclude Include="utils\alpha_processing.h" />
     <ClInclude Include="utils\bit_reader.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\color_cache.h" />
@@ -104,5 +115,10 @@
     <ClInclude Include="webp\mux.h" />
     <ClInclude Include="webp\mux_types.h" />
     <ClInclude Include="webp\types.h" />
+    <ClInclude Include="dsp\neon.h" />
+    <ClInclude Include="dsp\yuv_tables_sse2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dsp\Makefile.am" />
   </ItemGroup>
 </Project>
