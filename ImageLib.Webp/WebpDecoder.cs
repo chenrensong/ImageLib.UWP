@@ -17,8 +17,6 @@ namespace ImageLib.Webp
     public class WebpDecoder : IImageDecoder
     {
 
-
-
         public int HeaderSize
         {
             get
@@ -36,22 +34,15 @@ namespace ImageLib.Webp
         {
             byte[] bytes = new byte[streamSource.Size];
             await streamSource.ReadAsync(bytes.AsBuffer(), (uint)streamSource.Size, InputStreamOptions.None).AsTask(cancellationTokenSource.Token);
-            var imageSource = WebpCodec.DecodeRGBA(bytes);
+            var imageSource = WebpCodec.Decode(bytes);
             return imageSource;
         }
 
         public bool IsSupportedFileFormat(byte[] header)
         {
-            var riff = Encoding.UTF8.GetString(header, 0, 4);
-            if ("RIFF".Equals(riff))
-            {
-                var webp = Encoding.UTF8.GetString(header, 8, 4);
-                if ("WEBP".Equals(webp))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return header != null && header.Length == 12
+                && header[0] == 'R' && header[1] == 'I' && header[2] == 'F' && header[3] == 'F'
+                && header[8] == 'W' && header[9] == 'E' && header[10] == 'B' && header[11] == 'P';
         }
 
         public ImageSource RecreateSurfaces()
