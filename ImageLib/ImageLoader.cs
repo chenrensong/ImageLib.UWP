@@ -8,6 +8,8 @@ using ImageLib.Helpers;
 using System.Threading;
 using Windows.Storage.Streams;
 using ImageLib.Cache;
+using ImageLib.Schedulers;
+using Windows.System.Threading;
 
 namespace ImageLib
 {
@@ -15,6 +17,7 @@ namespace ImageLib
     {
 
         private static readonly object LockObject = new object();
+        private TaskScheduler _sequentialScheduler;
 
         private static ImageLoader _instance;
 
@@ -36,6 +39,7 @@ namespace ImageLib
 
         protected ImageLoader()
         {
+            _sequentialScheduler = new LimitedConcurrencyLevelTaskScheduler(1, WorkItemPriority.Normal, true);
         }
 
         protected virtual void CheckConfig()
@@ -136,17 +140,20 @@ namespace ImageLib
                         {
                             await Task.Factory.StartNew(() =>
                               {
+                                  ImageLog.Log(string.Format("{0} in task t-{1}", imageUri, Task.CurrentId));
                                   // Async saving to the storage cache without await
                                   var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
                                         .ContinueWith(task =>
                                             {
+                                                ImageLog.Log(string.Format("{0} in task t1-{1}", imageUri, Task.CurrentId));
+
                                                 if (task.IsFaulted || !task.Result)
                                                 {
                                                     ImageLog.Log("[error] failed to save in storage: " + imageUri);
                                                 }
                                             }
                                     );
-                              });
+                              }, default(CancellationToken), TaskCreationOptions.AttachedToParent, this._sequentialScheduler);
                         }
                     }
                 }

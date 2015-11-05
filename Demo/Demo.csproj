@@ -93,7 +93,12 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\1.3.gif" />
+    <Content Include="Images\2.2.gif" />
     <Content Include="Images\test.webp" />
+    <Content Include="Images\1.1.webp" />
+    <Content Include="Images\1.2.webp" />
+    <Content Include="Images\2.1.webp" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

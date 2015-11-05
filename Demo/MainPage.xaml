@@ -14,7 +14,11 @@
             <TextBlock
 				TextWrapping="Wrap"
 				Text="Set the UriSource property of ImageView to an http:, https:, ms-appx: or ms-appdata: URI to display a jpg、png、gif、webp.... " />
-
+            <Controls:ImageView 
+                Margin="0,20"
+                UriSource="ms-appx:///Images/1.webp"
+                Stretch="None"
+               />
             <Controls:ImageView 
                 Margin="0,20"
                 UriSource="ms-appx:///Images/test.webp"

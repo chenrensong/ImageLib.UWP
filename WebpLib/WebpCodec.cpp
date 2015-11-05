@@ -8,6 +8,7 @@
 #include "pch.h"
 #include "WebpCodec.h"
 #include "../webp/decode.h"
+#include "../webp/demux.h"
 #include <wrl/implements.h>
 #include <wrl\client.h>
 #include <windows.storage.streams.h>
@@ -36,18 +37,20 @@ WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
 	if (!WebPGetInfo(data->Data, data->Length, &width, &height)) {
 		return nullptr;
 	}
+
 	byte* pixels = WebPDecodeBGRA(data->Data, data->Length, &width, &height);
+
+	
 	WriteableBitmap^ bitmap = ref new WriteableBitmap(width, height);
 	IBuffer^ buffer = bitmap->PixelBuffer;
-	Array<byte>^ pixelsArray = ref new Array<byte>(pixels, width * height * 4);
 	ComPtr<IBufferByteAccess> pBufferByteAccess;
 	ComPtr<IUnknown> pBuffer((IUnknown*)buffer);
 	pBuffer.As(&pBufferByteAccess);
 	byte *sourcePixels = nullptr;
 	pBufferByteAccess->Buffer(&sourcePixels);
-	memcpy(sourcePixels, (void *)pixelsArray->Data, pixelsArray->Length);
+	memcpy(sourcePixels, (void *)pixels, width * height * 4);
 	bitmap->Invalidate();
-	delete pixelsArray;
 	delete pixels;
+
 	return bitmap;
 }
