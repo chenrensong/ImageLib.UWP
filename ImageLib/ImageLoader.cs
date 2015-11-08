@@ -44,7 +44,7 @@ namespace ImageLib
 
         protected virtual void CheckConfig()
         {
-            if (ImageConfig.Config == null)
+            if (ImageConfig.Default == null)
             {
                 throw new InvalidOperationException("ImageLoader configuration was not setted, please Initialize ImageLoader instance with JetImageLoaderConfiguration");
             }
@@ -88,7 +88,7 @@ namespace ImageLib
             }
             var imageUrl = imageUri.AbsoluteUri;
             //有Cache情况，先加载Cache
-            if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
+            if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
             {
                 //加载Cache
                 var resultFromCache = await LoadImageStreamFromCache(imageUri);
@@ -120,20 +120,20 @@ namespace ImageLib
 
                 ImageLog.Log("[network] loaded " + imageUrl);
 
-                if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
+                if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
                 {
-                    if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
-                        ImageConfig.Config.CacheMode == CacheMode.OnlyMemoryCache)
+                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
+                        ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
                     {
                         if (randStream != null)
                         {
-                            ImageConfig.Config.MemoryCacheImpl.Put(imageUrl, randStream);
+                            ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, randStream);
                         }
                     }
 
 
-                    if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
-                    ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
+                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
+                    ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
                     {
                         //是http or https 才加入本地缓存
                         if (imageUri.IsWeb())
@@ -142,7 +142,7 @@ namespace ImageLib
                               {
                                   ImageLog.Log(string.Format("{0} in task t-{1}", imageUri, Task.CurrentId));
                                   // Async saving to the storage cache without await
-                                  var saveAsync = ImageConfig.Config.StorageCacheImpl.SaveAsync(imageUrl, randStream)
+                                  var saveAsync = ImageConfig.Default.StorageCacheImpl.SaveAsync(imageUrl, randStream)
                                         .ContinueWith(task =>
                                             {
                                                 ImageLog.Log(string.Format("{0} in task t1-{1}", imageUri, Task.CurrentId));
@@ -167,7 +167,7 @@ namespace ImageLib
 
             // May be another thread has saved image to the cache
             // It is real working case
-            if (ImageConfig.Config.CacheMode != CacheMode.NoCache)
+            if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
             {
                 var resultFromCache = await LoadImageStreamFromCache(imageUri);
                 if (resultFromCache != null)
@@ -188,30 +188,30 @@ namespace ImageLib
         protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
         {
             var imageUrl = imageUri.AbsoluteUri;
-            if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
-                ImageConfig.Config.CacheMode == CacheMode.OnlyMemoryCache)
+            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
+                ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
             {
                 IRandomAccessStream memoryStream;
-                if (ImageConfig.Config.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
+                if (ImageConfig.Default.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
                 {
                     ImageLog.Log("[memory] " + imageUrl);
                     return memoryStream;
                 }
             }
 
-            if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache ||
-                ImageConfig.Config.CacheMode == CacheMode.OnlyStorageCache)
+            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
+                ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
             {
                 //网络uri且缓存可用
-                if (imageUri.IsWeb() && await ImageConfig.Config.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
+                if (imageUri.IsWeb() && await ImageConfig.Default.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
                     ImageLog.Log("[storage] " + imageUrl);
-                    var storageStream = await ImageConfig.Config.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
+                    var storageStream = await ImageConfig.Default.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
                     // Moving cache to the memory
-                    if (ImageConfig.Config.CacheMode == CacheMode.MemoryAndStorageCache
+                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache
                         && storageStream != null)
                     {
-                        ImageConfig.Config.MemoryCacheImpl.Put(imageUrl, storageStream);
+                        ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, storageStream);
                     }
                     return storageStream;
                 }

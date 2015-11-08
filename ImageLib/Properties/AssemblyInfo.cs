@@ -28,3 +28,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: ComVisible(false)]
 [assembly: InternalsVisibleTo("ImageLib.Gif")]
+[assembly: InternalsVisibleTo("ImageLib.Controls")]
+

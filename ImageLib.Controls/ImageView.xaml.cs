@@ -142,7 +142,7 @@ namespace ImageLib.Controls
             //debug模式不允许Decoders,直接采用默认方案
             if (!DesignMode.DesignModeEnabled)
             {
-                var decoders = ImageConfig.GetAvailableDecoders();
+                var decoders = ImageConfig.Default.GetAvailableDecoders();
                 if (decoders.Count > 0)
                 {
                     int maxHeaderSize = decoders.Max(x => x.HeaderSize);

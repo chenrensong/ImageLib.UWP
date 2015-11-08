@@ -12,43 +12,26 @@ namespace ImageLib
 {
     public class ImageConfig
     {
-        internal static ImageConfig Config;
+        internal static ImageConfig Default;
 
-        /// <summary>
-        /// Image decoder type list
-        /// </summary>
-        private static List<Type> _decoderTypes = new List<Type>();
-
-        public static void Initialize(ImageConfig ImageLoaderConfig)
+        public static void Initialize(ImageConfig imageConfig)
         {
-            if (ImageLoaderConfig == null)
+            if (imageConfig == null)
             {
                 throw new ArgumentException("Can not initialize ImageLoader with empty configuration");
             }
-            if (Config != null)
+            if (Default != null)
             {
                 return;
             }
-            Config = ImageLoaderConfig;
+            Default = imageConfig;
         }
-
-        public static ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
-        {
-            List<IImageDecoder> decoders = new List<IImageDecoder>();
-            foreach (Type decorderType in _decoderTypes)
-            {
-                if (decorderType != null)
-                {
-                    decoders.Add(Activator.CreateInstance(decorderType) as IImageDecoder);
-                }
-            }
-            return new ReadOnlyCollection<IImageDecoder>(decoders);
-        }
-
+      
         public readonly bool IsLogEnabled;
         public readonly CacheMode CacheMode;
         public readonly MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl;
         public readonly StorageCacheBase StorageCacheImpl;
+        public readonly List<Type> DecoderTypes;
 
         private ImageConfig(Builder builder)
         {
@@ -56,6 +39,20 @@ namespace ImageLib
             CacheMode = builder.CacheMode;
             MemoryCacheImpl = builder.MemoryCacheImpl;
             StorageCacheImpl = builder.StorageCacheImpl;
+            DecoderTypes = builder.DecoderTypes;
+        }
+
+        internal ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
+        {
+            List<IImageDecoder> decoders = new List<IImageDecoder>();
+            foreach (Type decorderType in DecoderTypes)
+            {
+                if (decorderType != null)
+                {
+                    decoders.Add(Activator.CreateInstance(decorderType) as IImageDecoder);
+                }
+            }
+            return new ReadOnlyCollection<IImageDecoder>(decoders);
         }
 
 
@@ -71,11 +68,15 @@ namespace ImageLib
             /// </summary>
             public bool IsLogEnabled { get; set; }
 
-
             /// <summary>
             /// Cache Mode
             /// </summary>
             private CacheMode _cacheMode = CacheMode.MemoryAndStorageCache;
+
+            /// <summary>
+            /// Decoder Types
+            /// </summary>
+            private List<Type> _decoderTypes = new List<Type>();
 
             /// <summary>
             /// Gets/Sets caching mode for ImageLoader
@@ -95,6 +96,19 @@ namespace ImageLib
             /// Default - null, I am sorry for that, but it requires StorageFolder instance, so you have to init it anyway
             /// </summary>
             public StorageCacheBase StorageCacheImpl { get; set; }
+
+
+            public List<Type> DecoderTypes
+            {
+                get
+                {
+                    return _decoderTypes;
+                }
+                set
+                {
+                    _decoderTypes = value;
+                }
+            }
 
 
             public Builder AddDecoder<TDecoder>() where TDecoder : IImageDecoder

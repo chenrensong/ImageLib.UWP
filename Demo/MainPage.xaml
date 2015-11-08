@@ -10,12 +10,14 @@
         <StackPanel Margin="10">
             <Button Content="返回" Click="Button_Click"/>
             <Button Content="回收内存" Click="Button_Click_1"/>
-
+            <Button Content="测试" HorizontalAlignment="Stretch" 
+                VerticalAlignment="Top" Click="Button_Click_2"/>
             <TextBlock
 				TextWrapping="Wrap"
 				Text="Set the UriSource property of ImageView to an http:, https:, ms-appx: or ms-appdata: URI to display a jpg、png、gif、webp.... " />
             <Controls:ImageView 
                 Margin="0,20"
+                x:Name="test"
                 UriSource="ms-appx:///Images/1.webp"
                 Stretch="None"
                />

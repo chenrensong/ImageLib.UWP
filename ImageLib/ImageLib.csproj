@@ -119,6 +119,10 @@
     <Compile Include="Cache\Memory\CacheImpl\WeakMemoryCache.cs" />
     <Compile Include="Cache\Memory\SynchronizedWeakDictionary.cs" />
     <Compile Include="Cache\Memory\WeakRefDictionary.cs" />
+    <Compile Include="Cache\Storage\MD5CacheGenerator.cs" />
+    <Compile Include="Cache\Storage\SHA256CacheGenerator.cs" />
+    <Compile Include="Cache\Storage\SHA512CacheGenerator.cs" />
+    <Compile Include="Cache\Storage\SHA384CacheGenerator.cs" />
     <Compile Include="Cache\Storage\StorageCacheBase.cs" />
     <Compile Include="Cache\Storage\SHA1CacheGenerator.cs" />
     <Compile Include="Cache\Storage\CacheImpl\LimitedStorageCache.cs" />
@@ -127,6 +131,7 @@
     <Compile Include="Cache\Storage\SynchronizedDictionary.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\AlgorithmHelper.cs" />
     <Compile Include="ImageLog.cs" />
     <Compile Include="IO\IImageDecoder.cs" />
     <Compile Include="ImageLoader.cs" />

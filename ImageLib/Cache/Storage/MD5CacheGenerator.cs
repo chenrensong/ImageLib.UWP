@@ -4,13 +4,13 @@ using Windows.Security.Cryptography.Core;
 namespace ImageLib.Cache.Storage
 {
     /// <summary>
-    /// Using SHA1 hash generator to generate cache file names
+    /// Using MD5 hash generator to generate cache file names
     /// </summary>
-    public class SHA1CacheGenerator : ICacheGenerator
+    public class MD5CacheGenerator : ICacheGenerator
     {
         public string GenerateCacheName(string url)
         {
-            return AlgorithmHelper.ComputeHash(url, HashAlgorithmNames.Sha1);
+            return AlgorithmHelper.ComputeHash(url, HashAlgorithmNames.Md5);
         }
     }
 }
