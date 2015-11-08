@@ -15,11 +15,26 @@
 ## XAML代码
 ``` xaml
  <controls:ImageView 
-            Margin="0,20"
-            UriSource="ms-appx:///Images/2.gif"
-            Stretch="None"/>
+           Margin="0,20"
+           UriSource="ms-appx:///Images/2.gif"
+           Stretch="None"/>
 ```
-
+## 自定义ImageLoader
+``` c#
+  ImageLoader.Register("test", new ImageConfig.Builder()
+            {
+                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
+                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
+                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
+                "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
+```
+``` xaml
+ <controls:ImageView 
+           ImageLoaderKey="test"
+           UriSource="ms-appx:///Images/2.gif"
+           Stretch="None"/>
+```
 ##支持URI格式
   http:, https:, ms-appx:,ms-appdata:,ms-resource;
 ##支持平台

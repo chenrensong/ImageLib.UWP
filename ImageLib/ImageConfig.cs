@@ -6,7 +6,6 @@ using ImageLib.Cache.Storage;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using ImageLib.IO;
-using System.Collections.ObjectModel;
 using ImageLib.Parser;
 
 namespace ImageLib
@@ -27,9 +26,6 @@ namespace ImageLib
             DecoderTypes = builder.DecoderTypes;
             UriParser = builder.UriParser;
         }
-
-
-
 
         /// <summary>
         /// Implements Builder pattern
