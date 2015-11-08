@@ -19,7 +19,7 @@ namespace ImageLib
         /// <param name="message">to output</param>
         internal static void Log(string message)
         {
-            if (ImageConfig.Default.IsLogEnabled)
+            if (ImageLoader.IsLogEnabled)
             {
                 Debug.WriteLine("{0} {1}", TAG, message);
             }

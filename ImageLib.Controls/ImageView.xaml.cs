@@ -60,6 +60,23 @@ namespace ImageLib.Controls
             new PropertyMetadata(false)
             );
 
+        private static DependencyProperty ImageLoaderKeyProperty { get; } = DependencyProperty.Register(
+            nameof(ImageLoaderKey),
+            typeof(string),
+            typeof(ImageView),
+            new PropertyMetadata(null)
+            );
+
+        /// <summary>
+        /// 用于定义当前的ImageLoader
+        /// </summary>
+        public string ImageLoaderKey
+        {
+            get { return GetValue(ImageLoaderKeyProperty) as string; }
+            set { SetValue(ImageLoaderKeyProperty, value); }
+        }
+
+
         public bool IsLoading
         {
             get { return (bool)GetValue(IsLoadingProperty); }
@@ -76,6 +93,21 @@ namespace ImageLib.Controls
         {
             get { return (Uri)GetValue(UriSourceProperty); }
             set { SetValue(UriSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// 获取当前的Image Loader
+        /// </summary>
+        private ImageLoader CurrentLoader
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(ImageLoaderKey))
+                {
+                    return ImageLoader.Collection[ImageLoaderKey];
+                }
+                return ImageLoader.Instance;
+            }
         }
 
         private IImageDecoder _imageDecoder;
@@ -136,13 +168,13 @@ namespace ImageLib.Controls
 
         private async Task<ImageSource> LoadImageByUri(Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
-            var randStream = await ImageLoader.Instance.LoadImageStream(uriSource, cancellationTokenSource);
+            var randStream = await this.CurrentLoader.LoadImageStream(uriSource, cancellationTokenSource);
             ImageSource imageSource = null;
             bool hasDecoder = false;
             //debug模式不允许Decoders,直接采用默认方案
             if (!DesignMode.DesignModeEnabled)
             {
-                var decoders = ImageConfig.Default.GetAvailableDecoders();
+                var decoders = this.CurrentLoader.GetAvailableDecoders();
                 if (decoders.Count > 0)
                 {
                     int maxHeaderSize = decoders.Max(x => x.HeaderSize);

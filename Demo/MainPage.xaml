@@ -28,6 +28,7 @@
                />
             <Controls:ImageView 
                 Margin="0,20"
+                ImageLoaderKey="test"
                 UriSource="http://b.hiphotos.baidu.com/zhidao/pic/item/9f510fb30f2442a768a9fe5fd043ad4bd01302a0.webp"
                 Stretch="None"
                />

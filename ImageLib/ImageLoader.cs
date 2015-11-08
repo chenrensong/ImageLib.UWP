@@ -8,14 +8,62 @@ using Windows.Storage.Streams;
 using ImageLib.Cache;
 using ImageLib.Schedulers;
 using Windows.System.Threading;
+using System.Collections.ObjectModel;
+using ImageLib.IO;
+using System.Collections.Generic;
 
 namespace ImageLib
 {
     public class ImageLoader
     {
+        /// <summary>
+        /// Enable/Disable log output for ImageLoader
+        /// Default - false
+        /// </summary>
+        internal static bool IsLogEnabled { get; set; }
+        internal static readonly Dictionary<string, ImageLoader> Collection = new Dictionary<string, ImageLoader>();
         private static readonly object LockObject = new object();
-        private TaskScheduler _sequentialScheduler;
+        /// <summary>
+        /// 默认的ImageLoader实例
+        /// </summary>
         private static ImageLoader _instance;
+        /// <summary>
+        /// 自定义Config
+        /// </summary>
+        private ImageConfig _ImageConfig;
+        /// <summary>
+        /// sequential Scheduler
+        /// </summary>
+        private TaskScheduler _sequentialScheduler;
+
+        public static ImageLoader Initialize(ImageConfig imageConfig, bool isLogEnabled = false)
+        {
+            if (imageConfig == null)
+            {
+                throw new ArgumentException("Can not initialize ImageLoader with empty configuration");
+            }
+            if (ImageLoader.Instance._ImageConfig != null)
+            {
+                return ImageLoader.Instance;
+            }
+            IsLogEnabled = isLogEnabled;
+            ImageLoader.Instance._ImageConfig = imageConfig;
+            return ImageLoader.Instance;
+        }
+
+        /// <summary>
+        /// 注册其他的Image Loader,便于不同策略使用
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="imageLoader"></param>
+        public static void Register(string key, ImageConfig imageConfig)
+        {
+            Collection.Add(key, new ImageLoader(imageConfig));
+        }
+
+        /// <summary>
+        /// 默认的Image Loader
+        /// </summary>
         public static ImageLoader Instance
         {
             get
@@ -30,14 +78,38 @@ namespace ImageLib
                 return _instance;
             }
         }
+
+
         protected ImageLoader()
         {
             _sequentialScheduler = new LimitedConcurrencyLevelTaskScheduler(1, WorkItemPriority.Normal, true);
         }
 
+        protected ImageLoader(ImageConfig imageConfig) : this()
+        {
+            if (imageConfig == null)
+            {
+                throw new ArgumentException("Can not initialize ImageLoader with empty configuration");
+            }
+            _ImageConfig = imageConfig;
+        }
+
+        internal ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
+        {
+            List<IImageDecoder> decoders = new List<IImageDecoder>();
+            foreach (Type decorderType in _ImageConfig.DecoderTypes)
+            {
+                if (decorderType != null)
+                {
+                    decoders.Add(Activator.CreateInstance(decorderType) as IImageDecoder);
+                }
+            }
+            return new ReadOnlyCollection<IImageDecoder>(decoders);
+        }
+
         protected virtual void CheckConfig()
         {
-            if (ImageConfig.Default == null)
+            if (_ImageConfig == null)
             {
                 throw new InvalidOperationException("ImageLoader configuration was not setted, please Initialize ImageLoader instance with JetImageLoaderConfiguration");
             }
@@ -81,10 +153,10 @@ namespace ImageLib
             }
             var imageUrl = imageUri.AbsoluteUri;
             //有Cache情况，先加载Cache
-            if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
+            if (_ImageConfig.CacheMode != CacheMode.NoCache)
             {
                 //加载Cache
-                var resultFromCache = await LoadImageStreamFromCache(imageUri);
+                var resultFromCache = await this.LoadImageStreamFromCache(imageUri);
                 if (resultFromCache != null)
                 {
                     return resultFromCache;
@@ -94,10 +166,10 @@ namespace ImageLib
             {
                 ImageLog.Log("[network] loading " + imageUrl);
                 IRandomAccessStream randStream = null;
-                //如果自定义UriParser,使用自定义Parser,反之使用默认方式.
-                if (ImageConfig.Default.UriParser != null)
+                //如果有自定义UriParser,使用自定义,反之使用默认方式.
+                if (_ImageConfig.UriParser != null)
                 {
-                    randStream = await ImageConfig.Default.
+                    randStream = await _ImageConfig.
                         UriParser.GetStreamFromUri(imageUri, cancellationTokenSource.Token);
                 }
                 else
@@ -118,22 +190,20 @@ namespace ImageLib
                     await copyAction.AsTask(cancellationTokenSource.Token);
                 }
                 randStream = inMemoryStream;
-
                 ImageLog.Log("[network] loaded " + imageUrl);
-
-                if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
+                if (_ImageConfig.CacheMode != CacheMode.NoCache)
                 {
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                        ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
+                    if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
+                        _ImageConfig.CacheMode == CacheMode.OnlyMemoryCache)
                     {
                         if (randStream != null)
                         {
-                            ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, randStream);
+                            _ImageConfig.MemoryCacheImpl.Put(imageUrl, randStream);
                         }
                     }
 
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                    ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
+                    if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
+                    _ImageConfig.CacheMode == CacheMode.OnlyStorageCache)
                     {
                         //是http or https 才加入本地缓存
                         if (imageUri.IsWebScheme())
@@ -142,11 +212,10 @@ namespace ImageLib
                               {
                                   ImageLog.Log(string.Format("{0} in task t-{1}", imageUri, Task.CurrentId));
                                   // Async saving to the storage cache without await
-                                  var saveAsync = ImageConfig.Default.StorageCacheImpl.SaveAsync(imageUrl, randStream)
+                                  var saveAsync = _ImageConfig.StorageCacheImpl.SaveAsync(imageUrl, randStream)
                                         .ContinueWith(task =>
                                             {
                                                 ImageLog.Log(string.Format("{0} in task t1-{1}", imageUri, Task.CurrentId));
-
                                                 if (task.IsFaulted || !task.Result)
                                                 {
                                                     ImageLog.Log("[error] failed to save in storage: " + imageUri);
@@ -167,7 +236,7 @@ namespace ImageLib
 
             // May be another thread has saved image to the cache
             // It is real working case
-            if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
+            if (_ImageConfig.CacheMode != CacheMode.NoCache)
             {
                 var resultFromCache = await LoadImageStreamFromCache(imageUri);
                 if (resultFromCache != null)
@@ -188,30 +257,30 @@ namespace ImageLib
         protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
         {
             var imageUrl = imageUri.AbsoluteUri;
-            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
+            if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
+                _ImageConfig.CacheMode == CacheMode.OnlyMemoryCache)
             {
                 IRandomAccessStream memoryStream;
-                if (ImageConfig.Default.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
+                if (_ImageConfig.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
                 {
                     ImageLog.Log("[memory] " + imageUrl);
                     return memoryStream;
                 }
             }
 
-            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
+            if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
+                _ImageConfig.CacheMode == CacheMode.OnlyStorageCache)
             {
                 //网络uri且缓存可用
-                if (imageUri.IsWebScheme() && await ImageConfig.Default.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
+                if (imageUri.IsWebScheme() && await _ImageConfig.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
                     ImageLog.Log("[storage] " + imageUrl);
-                    var storageStream = await ImageConfig.Default.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
+                    var storageStream = await _ImageConfig.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
                     // Moving cache to the memory
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache
+                    if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache
                         && storageStream != null)
                     {
-                        ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, storageStream);
+                        _ImageConfig.MemoryCacheImpl.Put(imageUrl, storageStream);
                     }
                     return storageStream;
                 }

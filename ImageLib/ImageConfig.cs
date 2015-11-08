@@ -13,31 +13,14 @@ namespace ImageLib
 {
     public class ImageConfig
     {
-        internal static ImageConfig Default;
-
-        public static void Initialize(ImageConfig imageConfig)
-        {
-            if (imageConfig == null)
-            {
-                throw new ArgumentException("Can not initialize ImageConfig with empty configuration");
-            }
-            if (Default != null)
-            {
-                return;
-            }
-            Default = imageConfig;
-        }
-
-        public readonly bool IsLogEnabled;
         public readonly CacheMode CacheMode;
         public readonly MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl;
         public readonly StorageCacheBase StorageCacheImpl;
         public readonly IUriParser UriParser;
-        private readonly List<Type> DecoderTypes;
+        public readonly List<Type> DecoderTypes;
 
         private ImageConfig(Builder builder)
         {
-            IsLogEnabled = builder.IsLogEnabled;
             CacheMode = builder.CacheMode;
             MemoryCacheImpl = builder.MemoryCacheImpl;
             StorageCacheImpl = builder.StorageCacheImpl;
@@ -45,18 +28,7 @@ namespace ImageLib
             UriParser = builder.UriParser;
         }
 
-        internal ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
-        {
-            List<IImageDecoder> decoders = new List<IImageDecoder>();
-            foreach (Type decorderType in DecoderTypes)
-            {
-                if (decorderType != null)
-                {
-                    decoders.Add(Activator.CreateInstance(decorderType) as IImageDecoder);
-                }
-            }
-            return new ReadOnlyCollection<IImageDecoder>(decoders);
-        }
+
 
 
         /// <summary>
@@ -65,11 +37,6 @@ namespace ImageLib
         /// <see cref="http://en.wikipedia.org/wiki/Builder_pattern"/>
         public class Builder
         {
-            /// <summary>
-            /// Enable/Disable log output for ImageLoader
-            /// Default - false
-            /// </summary>
-            public bool IsLogEnabled { get; set; }
 
             /// <summary>
             /// Cache Mode

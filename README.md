@@ -4,14 +4,13 @@
  
 ## 初始化
 ``` c#
-  ImageConfig.Initialize(new ImageConfig.Builder()
-          {
-              CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-              IsLogEnabled = true,
-              MemoryCacheImpl = new WeakMemoryCache<string, IRandomAccessStream>(),
-              StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-              "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-          }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
+  ImageLoader.Initialize(new ImageConfig.Builder()
+            {
+                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
+                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
+                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
+                "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), false);
 ```
 ## XAML代码
 ``` xaml

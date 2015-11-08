@@ -34,14 +34,22 @@ namespace Demo
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            ImageConfig.Initialize(new ImageConfig.Builder()
+            ImageLoader.Initialize(new ImageConfig.Builder()
             {
                 CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                IsLogEnabled = true,
                 MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), false);
+
+            ImageLoader.Register("test", new ImageConfig.Builder()
+            {
+                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
+                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
+                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
+                "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
+
         }
 
         /// <summary>
