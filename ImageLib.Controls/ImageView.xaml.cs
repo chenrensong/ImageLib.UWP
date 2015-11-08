@@ -160,10 +160,7 @@ namespace ImageLib.Controls
                                 cancellationTokenSource);
                             if (!cancellationTokenSource.IsCancellationRequested)
                             {
-                                if (_imageDecoder != null)
-                                {
-                                    _imageDecoder.Dispose();
-                                }
+                                _imageDecoder?.Dispose();
                                 Interlocked.Exchange(ref _imageDecoder, decoder);
                                 if (_isControlLoaded)
                                 {

@@ -1,7 +1,5 @@
 ﻿
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Imaging;
 using ImageLib.Helpers;
@@ -15,12 +13,9 @@ namespace ImageLib
 {
     public class ImageLoader
     {
-
         private static readonly object LockObject = new object();
         private TaskScheduler _sequentialScheduler;
-
         private static ImageLoader _instance;
-
         public static ImageLoader Instance
         {
             get
@@ -32,11 +27,9 @@ namespace ImageLib
                         if (_instance == null) _instance = new ImageLoader();
                     }
                 }
-
                 return _instance;
             }
         }
-
         protected ImageLoader()
         {
             _sequentialScheduler = new LimitedConcurrencyLevelTaskScheduler(1, WorkItemPriority.Normal, true);
@@ -92,17 +85,25 @@ namespace ImageLib
             {
                 //加载Cache
                 var resultFromCache = await LoadImageStreamFromCache(imageUri);
-
                 if (resultFromCache != null)
                 {
                     return resultFromCache;
                 }
             }
-
             try
             {
                 ImageLog.Log("[network] loading " + imageUrl);
-                var randStream = await imageUri.GetStreamFromUri(cancellationTokenSource.Token);
+                IRandomAccessStream randStream = null;
+                //如果自定义UriParser,使用自定义Parser,反之使用默认方式.
+                if (ImageConfig.Default.UriParser != null)
+                {
+                    randStream = await ImageConfig.Default.
+                        UriParser.GetStreamFromUri(imageUri, cancellationTokenSource.Token);
+                }
+                else
+                {
+                    randStream = await imageUri.GetStreamFromUri(cancellationTokenSource.Token);
+                }
                 if (randStream == null)
                 {
                     ImageLog.Log("[error] failed to download: " + imageUrl);
@@ -131,12 +132,11 @@ namespace ImageLib
                         }
                     }
 
-
                     if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
                     ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
                     {
                         //是http or https 才加入本地缓存
-                        if (imageUri.IsWeb())
+                        if (imageUri.IsWebScheme())
                         {
                             await Task.Factory.StartNew(() =>
                               {
@@ -203,7 +203,7 @@ namespace ImageLib
                 ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
             {
                 //网络uri且缓存可用
-                if (imageUri.IsWeb() && await ImageConfig.Default.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
+                if (imageUri.IsWebScheme() && await ImageConfig.Default.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
                     ImageLog.Log("[storage] " + imageUrl);
                     var storageStream = await ImageConfig.Default.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);

@@ -132,6 +132,7 @@
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\AlgorithmHelper.cs" />
+    <Compile Include="Parser\IUriParser.cs" />
     <Compile Include="ImageLog.cs" />
     <Compile Include="IO\IImageDecoder.cs" />
     <Compile Include="ImageLoader.cs" />

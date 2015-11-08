@@ -7,6 +7,7 @@ using Windows.Storage.Streams;
 using System.Collections.Generic;
 using ImageLib.IO;
 using System.Collections.ObjectModel;
+using ImageLib.Parser;
 
 namespace ImageLib
 {
@@ -18,7 +19,7 @@ namespace ImageLib
         {
             if (imageConfig == null)
             {
-                throw new ArgumentException("Can not initialize ImageLoader with empty configuration");
+                throw new ArgumentException("Can not initialize ImageConfig with empty configuration");
             }
             if (Default != null)
             {
@@ -26,12 +27,13 @@ namespace ImageLib
             }
             Default = imageConfig;
         }
-      
+
         public readonly bool IsLogEnabled;
         public readonly CacheMode CacheMode;
         public readonly MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl;
         public readonly StorageCacheBase StorageCacheImpl;
-        public readonly List<Type> DecoderTypes;
+        public readonly IUriParser UriParser;
+        private readonly List<Type> DecoderTypes;
 
         private ImageConfig(Builder builder)
         {
@@ -40,6 +42,7 @@ namespace ImageLib
             MemoryCacheImpl = builder.MemoryCacheImpl;
             StorageCacheImpl = builder.StorageCacheImpl;
             DecoderTypes = builder.DecoderTypes;
+            UriParser = builder.UriParser;
         }
 
         internal ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
@@ -97,6 +100,7 @@ namespace ImageLib
             /// </summary>
             public StorageCacheBase StorageCacheImpl { get; set; }
 
+            public IUriParser UriParser { get; set; }
 
             public List<Type> DecoderTypes
             {
@@ -109,7 +113,6 @@ namespace ImageLib
                     _decoderTypes = value;
                 }
             }
-
 
             public Builder AddDecoder<TDecoder>() where TDecoder : IImageDecoder
             {
