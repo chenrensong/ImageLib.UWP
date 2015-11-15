@@ -1,6 +1,6 @@
 # ImageLib.UWP
 
-[![Build status](https://ci.appveyor.com/api/projects/status/4oox3d156y9n6efp?svg=true)](https://ci.appveyor.com/project/rsuter/mytoolkit)
+
 [![NuGet Version](https://img.shields.io/nuget/v/imagelib.uwp.svg?style=flat)](https://www.nuget.org/packages?q=imagelib.uwp) 
 
 
