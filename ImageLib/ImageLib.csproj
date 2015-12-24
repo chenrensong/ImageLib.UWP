@@ -114,7 +114,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheMode.cs" />
-    <Compile Include="Cache\Memory\CacheImpl\LRUCache.cs" />
+    <Compile Include="Cache\Memory\LRUCache.cs" />
+    <Compile Include="Cache\Memory\CacheImpl\LRUMemoryCache.cs" />
     <Compile Include="Cache\Memory\MemoryCacheBase.cs" />
     <Compile Include="Cache\Memory\CacheImpl\WeakMemoryCache.cs" />
     <Compile Include="Cache\Memory\SynchronizedWeakDictionary.cs" />

@@ -59,8 +59,15 @@ namespace ImageLib.Helpers
                     }
                 default:
                     {
-                        RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
-                        return await streamRef.OpenReadAsync().AsTask(cancellationToken).ConfigureAwait(false);
+                        try
+                        {
+                            RandomAccessStreamReference streamRef = RandomAccessStreamReference.CreateFromUri(uri);
+                            return await streamRef.OpenReadAsync().AsTask(cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            return null;
+                        }
                     }
             }
         }

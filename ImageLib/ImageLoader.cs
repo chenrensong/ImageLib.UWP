@@ -36,6 +36,7 @@ namespace ImageLib
         /// </summary>
         private TaskScheduler _sequentialScheduler;
 
+
         public static ImageLoader Initialize(ImageConfig imageConfig, bool isLogEnabled = false)
         {
             if (imageConfig == null)
@@ -134,7 +135,8 @@ namespace ImageLib
         {
             CheckConfig();
             var bitmapImage = new BitmapImage();
-            await bitmapImage.SetSourceAsync(await LoadImageStream(imageUri, cancellationTokenSource));
+            var stream = await LoadImageStream(imageUri, cancellationTokenSource);
+            await bitmapImage.SetSourceAsync(stream);
             return bitmapImage;
         }
 
@@ -156,6 +158,7 @@ namespace ImageLib
             if (_ImageConfig.CacheMode != CacheMode.NoCache)
             {
                 //加载Cache
+
                 var resultFromCache = await this.LoadImageStreamFromCache(imageUri);
                 if (resultFromCache != null)
                 {
@@ -220,6 +223,7 @@ namespace ImageLib
                                                 {
                                                     ImageLog.Log("[error] failed to save in storage: " + imageUri);
                                                 }
+
                                             }
                                     );
                               }, default(CancellationToken), TaskCreationOptions.AttachedToParent, this._sequentialScheduler);
@@ -229,16 +233,18 @@ namespace ImageLib
 
                 return randStream;
             }
-            catch
+            catch (Exception ex)
             {
                 ImageLog.Log("[error] failed to save loaded image: " + imageUrl);
             }
 
+            //var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             // May be another thread has saved image to the cache
             // It is real working case
             if (_ImageConfig.CacheMode != CacheMode.NoCache)
             {
-                var resultFromCache = await LoadImageStreamFromCache(imageUri);
+                var resultFromCache = await this.LoadImageStreamFromCache(imageUri);
+
                 if (resultFromCache != null)
                 {
                     return resultFromCache;
@@ -249,18 +255,17 @@ namespace ImageLib
             return null;
         }
 
-        /// <summary>
-        /// Loads image stream from memory or storage cachecache
-        /// </summary>
-        /// <param name="imageUrl"></param>
-        /// <returns>Steam of the image or null if it was not found in cache</returns>
-        protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
+
+        private async Task<IRandomAccessStream> LoadImageStreamFromCacheInternal(Uri imageUri)
         {
+
             var imageUrl = imageUri.AbsoluteUri;
+
             if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
-                _ImageConfig.CacheMode == CacheMode.OnlyMemoryCache)
+               _ImageConfig.CacheMode == CacheMode.OnlyMemoryCache)
             {
                 IRandomAccessStream memoryStream;
+                //尝试获取内存缓存
                 if (_ImageConfig.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
                 {
                     ImageLog.Log("[memory] " + imageUrl);
@@ -268,8 +273,9 @@ namespace ImageLib
                 }
             }
 
+            //获取不到内存缓存
             if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache ||
-                _ImageConfig.CacheMode == CacheMode.OnlyStorageCache)
+                  _ImageConfig.CacheMode == CacheMode.OnlyStorageCache)
             {
                 //网络uri且缓存可用
                 if (imageUri.IsWebScheme() && await _ImageConfig.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
@@ -278,7 +284,7 @@ namespace ImageLib
                     var storageStream = await _ImageConfig.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
                     // Moving cache to the memory
                     if (_ImageConfig.CacheMode == CacheMode.MemoryAndStorageCache
-                        && storageStream != null)
+                          && storageStream != null)
                     {
                         _ImageConfig.MemoryCacheImpl.Put(imageUrl, storageStream);
                     }
@@ -286,6 +292,24 @@ namespace ImageLib
                 }
             }
             return null;
+
+        }
+
+
+        /// <summary>
+        /// Loads image stream from memory or storage cachecache
+        /// </summary>
+        /// <param name="imageUrl"></param>
+        /// <returns>Steam of the image or null if it was not found in cache</returns>
+        protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
+        {
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            return await Task.Factory.StartNew(() =>
+            {
+                var result = LoadImageStreamFromCacheInternal(imageUri).Result;
+                return result;
+            });
+            //return await LoadImageStreamFromCacheInternal(imageUri);
         }
 
 

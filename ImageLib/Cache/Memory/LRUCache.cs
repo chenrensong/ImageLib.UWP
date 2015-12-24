@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ImageLib.Cache.Memory.CacheImpl
+namespace ImageLib.Cache.Memory
 {
+    /// <summary>
+    /// LRU Cache
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     public class LRUCache<TKey, TValue> : MemoryCacheBase<TKey, TValue> where TKey : class where TValue : class
     {
         private readonly object _lockObj = new object();
+
         private Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>> _cacheMap
             = new Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>>();
-        private LinkedList<LRUCacheItem<TKey, TValue>> _lruList = new LinkedList<LRUCacheItem<TKey, TValue>>();
+
+        protected LinkedList<LRUCacheItem<TKey, TValue>> _lruList = new LinkedList<LRUCacheItem<TKey, TValue>>();
+
         /// <summary>
         /// Capacity
         /// </summary>
-        private int _capacity;
+        protected int _capacity;
+
+
 
         public LRUCache(int capacity = 20)
         {
@@ -39,12 +49,9 @@ namespace ImageLib.Cache.Memory.CacheImpl
         {
             lock (_lockObj)
             {
-                if (_cacheMap.Count >= _capacity)
-                {
-                    RemoveFirst();
-                }
+                this.CheckSize(key, value);
                 LRUCacheItem<TKey, TValue> cacheItem = new LRUCacheItem<TKey, TValue>(key, value);
-                LinkedListNode<LRUCacheItem<TKey, TValue>> node = 
+                LinkedListNode<LRUCacheItem<TKey, TValue>> node =
                     new LinkedListNode<LRUCacheItem<TKey, TValue>>(cacheItem);
                 _lruList.AddLast(node);
                 _cacheMap.Add(key, node);
@@ -74,7 +81,23 @@ namespace ImageLib.Cache.Memory.CacheImpl
             _lruList.Clear();
         }
 
-        private void RemoveFirst()
+
+
+
+        /// <summary>
+        /// 检测目前内存大小
+        /// </summary>
+        protected virtual void CheckSize(TKey key, TValue value)
+        {
+            if (_cacheMap.Count >= _capacity)
+            {
+                RemoveFirst();
+            }
+        }
+
+
+
+        protected virtual void RemoveFirst()
         {
             // Remove from LRUPriority
             LinkedListNode<LRUCacheItem<TKey, TValue>> node = _lruList.First;
@@ -89,7 +112,7 @@ namespace ImageLib.Cache.Memory.CacheImpl
         /// </summary>
         /// <typeparam name="K"></typeparam>
         /// <typeparam name="V"></typeparam>
-        private class LRUCacheItem<K, V>
+        protected class LRUCacheItem<K, V>
         {
             public LRUCacheItem(K k, V v)
             {

@@ -37,15 +37,15 @@ namespace Demo
             ImageLoader.Initialize(new ImageConfig.Builder()
             {
                 CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
+                MemoryCacheImpl = new LRUMemoryCache(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), false);
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), true);
 
             ImageLoader.Register("test", new ImageConfig.Builder()
             {
                 CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
+                MemoryCacheImpl = new LRUMemoryCache(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
                 "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());

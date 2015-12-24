@@ -168,7 +168,12 @@ namespace ImageLib.Controls
 
         private async Task<ImageSource> LoadImageByUri(Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
+
             var randStream = await this.CurrentLoader.LoadImageStream(uriSource, cancellationTokenSource);
+            if (randStream == null)
+            {
+                throw new Exception("stream is null");
+            }
             ImageSource imageSource = null;
             bool hasDecoder = false;
             //debug模式不允许Decoders,直接采用默认方案
@@ -211,6 +216,7 @@ namespace ImageLib.Controls
                 imageSource = bitmapImage;
             }
             return imageSource;
+
         }
 
 
