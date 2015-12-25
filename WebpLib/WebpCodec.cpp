@@ -39,8 +39,6 @@ WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
 	}
 
 	byte* pixels = WebPDecodeBGRA(data->Data, data->Length, &width, &height);
-
-	
 	WriteableBitmap^ bitmap = ref new WriteableBitmap(width, height);
 	IBuffer^ buffer = bitmap->PixelBuffer;
 	ComPtr<IBufferByteAccess> pBufferByteAccess;
@@ -51,6 +49,5 @@ WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
 	memcpy(sourcePixels, (void *)pixels, width * height * 4);
 	bitmap->Invalidate();
 	delete pixels;
-
 	return bitmap;
 }

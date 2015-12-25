@@ -303,13 +303,19 @@ namespace ImageLib
         /// <returns>Steam of the image or null if it was not found in cache</returns>
         protected virtual async Task<IRandomAccessStream> LoadImageStreamFromCache(Uri imageUri)
         {
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            return await Task.Factory.StartNew(() =>
+            var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000 * 10));
+            return await Task<IRandomAccessStream>.Factory.StartNew(() =>
             {
-                var result = LoadImageStreamFromCacheInternal(imageUri).Result;
-                return result;
-            });
-            //return await LoadImageStreamFromCacheInternal(imageUri);
+                try
+                {
+                    var result = LoadImageStreamFromCacheInternal(imageUri).Result;
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+            }, cts.Token);
         }
 
 

@@ -21,8 +21,13 @@ namespace Demo
             list.Add(new Uri("ms-appx:///Images/2.gif"));
             list.Add(new Uri("ms-appx:///Images/3.gif"));
             list.Add(new Uri("ms-appx:///Images/2.gif"));
-            list.Add(new Uri("ms-appx:///Images/3.gif"));
-            list.Add(new Uri("ms-appx:///Images/test.webp"));
+
+            list.Add(new Uri("https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2325341245,1339346477&fm=116&gp=0.jpg"));
+            list.Add(new Uri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1531287533,3542560576&fm=116&gp=0.jpg"));
+            list.Add(new Uri("https://www.baidu.com/img/baidu_jgylogo3.gif"));
+            list.Add(new Uri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1531287533,3542560576&fm=116&gp=0.jpg"));
+            list.Add(new Uri("https://www.baidu.com/img/baidu_jgylogo3.gif"));
+            list.Add(new Uri("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1531287533,3542560576&fm=116&gp=0.jpg"));
             list.Add(new Uri("http://b.hiphotos.baidu.com/zhidao/pic/item/9f510fb30f2442a768a9fe5fd043ad4bd01302a0.webp"));
             list.Add(new Uri("http://imgsrc.baidu.com/forum/w%3D580%3B/sign=ca3845692bf5e0feee1889096c5b35a8/7e3e6709c93d70cf01e0e07dfedcd100baa12ba3.webp"));
             list.Add(new Uri("http://img5.duitang.com/uploads/item/201411/25/20141125200101_QQjNY.gif"));
