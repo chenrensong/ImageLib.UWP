@@ -49,6 +49,10 @@ namespace ImageLib.Cache.Memory
         {
             lock (_lockObj)
             {
+                if (_cacheMap.ContainsKey(key))
+                {
+                    return;
+                }
                 this.CheckSize(key, value);
                 LRUCacheItem<TKey, TValue> cacheItem = new LRUCacheItem<TKey, TValue>(key, value);
                 LinkedListNode<LRUCacheItem<TKey, TValue>> node =
@@ -87,23 +91,30 @@ namespace ImageLib.Cache.Memory
         /// <summary>
         /// 检测目前内存大小
         /// </summary>
-        protected virtual void CheckSize(TKey key, TValue value)
+        protected virtual bool CheckSize(TKey key, TValue value)
         {
             if (_cacheMap.Count >= _capacity)
             {
                 RemoveFirst();
             }
+            return true;
         }
 
+        protected virtual void RemoveNode(LinkedListNode<LRUCacheItem<TKey, TValue>> node)
+        {
+            _lruList.Remove(node);
+            _cacheMap.Remove(node.Value.Key);
+        }
 
-
-        protected virtual void RemoveFirst()
+        protected void RemoveFirst()
         {
             // Remove from LRUPriority
             LinkedListNode<LRUCacheItem<TKey, TValue>> node = _lruList.First;
-            _lruList.RemoveFirst();
-            // Remove from cache
-            _cacheMap.Remove(node.Value.Key);
+            this.RemoveNode(node);
+
+            //_lruList.RemoveFirst();
+            //// Remove from cache
+            //_cacheMap.Remove(node.Value.Key);
         }
 
 

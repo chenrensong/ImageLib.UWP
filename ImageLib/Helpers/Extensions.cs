@@ -6,7 +6,9 @@
 // All rights reserved.
 // ===============================================================================
 
+using ImageLib.Http;
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Resources.Core;
@@ -66,7 +68,16 @@ namespace ImageLib.Helpers
                         }
                         catch (Exception ex)
                         {
-                            return null;
+                            try
+                            {
+                                AsyncHttpClient httpClient = new AsyncHttpClient();
+                                var rsp = await httpClient.Uri(uri).Get();
+                                return await rsp.GetRandomStream();
+                            }
+                            catch (Exception hex)
+                            {
+                                return null;
+                            }
                         }
                     }
             }

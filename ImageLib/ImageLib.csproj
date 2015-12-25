@@ -113,6 +113,8 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\AsyncHttpClient.cs" />
+    <Compile Include="Http\AsyncHttpResponse.cs" />
     <Compile Include="Cache\CacheMode.cs" />
     <Compile Include="Cache\Memory\LRUCache.cs" />
     <Compile Include="Cache\Memory\CacheImpl\LRUMemoryCache.cs" />

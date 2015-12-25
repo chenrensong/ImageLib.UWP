@@ -135,17 +135,21 @@ namespace ImageLib.Gif
         public async Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
         {
-            var bitmapDecoder = await BitmapDecoder.
-                CreateAsync(BitmapDecoder.GifDecoderId, streamSource).AsTask(cancellationTokenSource.Token).ConfigureAwait(false);
 
+            var inMemoryStream = new InMemoryRandomAccessStream();
+            var copyAction = RandomAccessStream.CopyAndCloseAsync(
+                           streamSource.GetInputStreamAt(0L),
+                           inMemoryStream.GetOutputStreamAt(0L));
+            await copyAction.AsTask(cancellationTokenSource.Token);
+
+            var bitmapDecoder = await BitmapDecoder.
+                CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream).AsTask(cancellationTokenSource.Token).ConfigureAwait(false);
             var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
             var frameProperties = new List<FrameProperties>();
-
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
             {
                 var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask(cancellationTokenSource.Token).ConfigureAwait(false); ;
                 frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
-
             }
 
             _frameProperties = frameProperties;

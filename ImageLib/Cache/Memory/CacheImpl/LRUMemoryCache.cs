@@ -1,4 +1,5 @@
-﻿using Windows.Storage.Streams;
+﻿using System.Collections.Generic;
+using Windows.Storage.Streams;
 
 namespace ImageLib.Cache.Memory.CacheImpl
 {
@@ -14,7 +15,7 @@ namespace ImageLib.Cache.Memory.CacheImpl
             this._capacity = capacity;
         }
 
-        protected override void CheckSize(string key, IRandomAccessStream value)
+        protected override bool CheckSize(string key, IRandomAccessStream value)
         {
             var size = (int)value.Size;
             _currentSize += size;
@@ -22,14 +23,13 @@ namespace ImageLib.Cache.Memory.CacheImpl
             {
                 this.RemoveFirst();
             }
+            return true;
         }
 
-        protected override void RemoveFirst()
+        protected override void RemoveNode(LinkedListNode<LRUCacheItem<string, IRandomAccessStream>> node)
         {
-            var node = _lruList.First;
-            var value = node.Value.Value;
-            _currentSize -= (int)value.Size;
-            base.RemoveFirst();
+            base.RemoveNode(node);
+            _currentSize -= (int)node.Value.Value.Size;
         }
 
 
