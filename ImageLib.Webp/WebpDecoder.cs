@@ -15,6 +15,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Media;
 using System.Runtime.InteropServices.WindowsRuntime;
 using WebpLib;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace ImageLib.Webp
 {
@@ -34,13 +35,22 @@ namespace ImageLib.Webp
             //empty
         }
 
-        public async Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
+        public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource,
+             CancellationTokenSource cancellationTokenSource)
         {
             byte[] bytes = new byte[streamSource.Size];
             await streamSource.ReadAsync(bytes.AsBuffer(), (uint)streamSource.Size, InputStreamOptions.None).AsTask(cancellationTokenSource.Token);
-            var imageSource = WebpCodec.Decode(bytes);
+            WriteableBitmap writeableBitmap = WebpCodec.Decode(bytes);
+            ExtendImageSource imageSource = new ExtendImageSource();
+            if (writeableBitmap != null)
+            {
+                imageSource.PixelWidth = writeableBitmap.PixelWidth;
+                imageSource.PixelHeight = writeableBitmap.PixelHeight;
+                imageSource.ImageSource = writeableBitmap;
+            }
             return imageSource;
         }
+
 
         public bool IsSupportedFileFormat(byte[] header)
         {

@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using ImageLib.IO;
 using Windows.ApplicationModel;
+using Windows.Graphics.Imaging;
 
 namespace ImageLib.Controls
 {
@@ -32,7 +33,7 @@ namespace ImageLib.Controls
         /// <summary>
         /// 加载完成
         /// </summary>
-        public event EventHandler LoadingCompleted;
+        public event EventHandler<LoadingCompletedEventArgs> LoadingCompleted;
         /// <summary>
         /// 加载失败
         /// </summary>
@@ -96,6 +97,23 @@ namespace ImageLib.Controls
         }
 
         /// <summary>
+        /// Pixel Width
+        /// </summary>
+        public double PixelWidth
+        {
+            get; private set;
+        }
+
+        /// <summary>
+        /// Pixel Height
+        /// </summary>
+        public double PixelHeight
+        {
+            get; private set;
+        }
+
+
+        /// <summary>
         /// 获取当前的Image Loader
         /// </summary>
         private ImageLoader CurrentLoader
@@ -130,6 +148,8 @@ namespace ImageLib.Controls
             _imageDecoder?.Dispose();
             _initializationCancellationTokenSource?.Cancel();
             _image.Source = null;
+            this.PixelHeight = 0d;
+            this.PixelWidth = 0d;
             Interlocked.Exchange(ref _imageDecoder, null);
             if (UriSource != null)
             {
@@ -148,7 +168,7 @@ namespace ImageLib.Controls
                     {
                         //不处理此情况
                     }
-                    this.OnLoadingCompleted();
+                    this.OnLoadingCompleted(imageSource);
                 }
                 catch (TaskCanceledException)
                 {
@@ -193,8 +213,11 @@ namespace ImageLib.Controls
                         var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
                         if (decoder != null)
                         {
-                            imageSource = await decoder.InitializeAsync(this.Dispatcher, randStream,
-                                cancellationTokenSource);
+                            var source = await decoder.InitializeAsync(this.Dispatcher, randStream,
+                                    cancellationTokenSource);
+                            imageSource = source.ImageSource;
+                            this.PixelHeight = source.PixelHeight;
+                            this.PixelWidth = source.PixelWidth;
                             if (!cancellationTokenSource.IsCancellationRequested)
                             {
                                 _imageDecoder?.Dispose();
@@ -213,6 +236,8 @@ namespace ImageLib.Controls
             {
                 var bitmapImage = new BitmapImage();
                 await bitmapImage.SetSourceAsync(randStream).AsTask(cancellationTokenSource.Token);
+                this.PixelHeight = bitmapImage.PixelHeight;
+                this.PixelWidth = bitmapImage.PixelWidth;
                 imageSource = bitmapImage;
             }
             return imageSource;
@@ -229,12 +254,12 @@ namespace ImageLib.Controls
             }
         }
 
-        private void OnLoadingCompleted()
+        private void OnLoadingCompleted(ImageSource imageSource)
         {
             this.IsLoading = false;
             if (LoadingCompleted != null)
             {
-                LoadingCompleted.Invoke(this, EventArgs.Empty);
+                LoadingCompleted.Invoke(this, new LoadingCompletedEventArgs(this.PixelWidth, this.PixelWidth));
             }
         }
 

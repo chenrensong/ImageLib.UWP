@@ -113,6 +113,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtendImageSource.cs" />
     <Compile Include="Http\AsyncHttpClient.cs" />
     <Compile Include="Http\AsyncHttpResponse.cs" />
     <Compile Include="Cache\CacheMode.cs" />

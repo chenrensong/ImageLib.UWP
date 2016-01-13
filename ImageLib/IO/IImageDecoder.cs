@@ -59,7 +59,7 @@ namespace ImageLib.IO
         /// <param name="dispatcher">用于UI线程绘制</param>
         /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher,
+        Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
 
     }

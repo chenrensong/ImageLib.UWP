@@ -132,7 +132,7 @@ namespace ImageLib.Gif
         private CoreDispatcher _dispatcher;
 
 
-        public async Task<ImageSource> InitializeAsync(CoreDispatcher dispatcher,
+        public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
         {
 
@@ -163,7 +163,15 @@ namespace ImageLib.Gif
              });
 
             _isInitialized = true;
-            return _canvasImageSource;
+            ExtendImageSource imageSource = new ExtendImageSource();
+            if (_canvasImageSource != null)
+            {
+                imageSource.PixelWidth = _imageProperties.PixelWidth;
+                imageSource.PixelHeight = _imageProperties.PixelHeight;
+                imageSource.ImageSource = _canvasImageSource;
+            }
+
+            return imageSource;
         }
 
         public void Start()
@@ -551,6 +559,8 @@ namespace ImageLib.Gif
                 _animationTimer = null;
             }
         }
+
+
 
 
         #endregion
