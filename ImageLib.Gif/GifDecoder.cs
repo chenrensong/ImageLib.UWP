@@ -389,9 +389,22 @@ namespace ImageLib.Gif
                     updateRectangle = imageRectangle;
                 }
 
-                using (var drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, updateRectangle))
+                CanvasDrawingSession drawingSession = null;
+                try
                 {
-                    drawingSession.DrawImage(_accumulationRenderTarget); // Render target has the composed frame
+                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, updateRectangle);
+                }
+                catch (Exception ex)
+                {
+                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, imageRectangle);
+                }
+                finally
+                {
+                    if (drawingSession != null)
+                    {
+                        drawingSession.DrawImage(_accumulationRenderTarget); // Render target has the composed frame
+                        drawingSession.Dispose();
+                    }
                 }
 
             }
