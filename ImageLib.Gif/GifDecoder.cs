@@ -564,6 +564,7 @@ namespace ImageLib.Gif
                 _isInitialized = false;
                 _hasCanvasResources = false;
                 _bitmapDecoder = null;
+                _isRangeError = false;
                 if (_frameProperties != null)
                 {
                     foreach (var item in _frameProperties)
