@@ -5,6 +5,7 @@
     xmlns:local="using:Demo"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Controls="using:ImageLib.Controls"
     mc:Ignorable="d">
 
     <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -14,5 +15,13 @@
         <Button Content="回收内存" HorizontalAlignment="Stretch" 
                 VerticalAlignment="Top" Click="Button_Click_1"/>
 
+        <Controls:ImageView 
+                Margin="0,20"
+                x:Name="test"
+                UriSource="http://www.gif.im/uploads/allimg/130518/1-13051Q03309.gif"
+                Stretch="None"
+               />
+
+        
     </StackPanel>
 </Page>

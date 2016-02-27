@@ -131,6 +131,8 @@ namespace ImageLib.Gif
         private bool _hasCanvasResources;
         private CoreDispatcher _dispatcher;
 
+        private bool _isRangeError = false;
+
 
         public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
@@ -156,6 +158,7 @@ namespace ImageLib.Gif
             _bitmapDecoder = bitmapDecoder;
             _imageProperties = imageProperties;
             _dispatcher = dispatcher;
+            _isRangeError = false;
 
             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {
@@ -271,7 +274,7 @@ namespace ImageLib.Gif
             try
             {
                 PrepareFrame(pixels, frameRectangle, shouldClear);
-                UpdateImageSource(frameRectangle);
+                UpdateImageSource(pixels, frameRectangle, shouldClear);
             }
             catch (Exception e) when (_canvasImageSource.Device.IsDeviceLost(e.HResult))
             {
@@ -376,7 +379,7 @@ namespace ImageLib.Gif
 
         }
 
-        private void UpdateImageSource(Rect updateRectangle)
+        private void UpdateImageSource(byte[] pixels, Rect updateRectangle, bool clearAccumulation)
         {
             if (Window.Current.Visible)
             {
@@ -392,10 +395,11 @@ namespace ImageLib.Gif
                 CanvasDrawingSession drawingSession = null;
                 try
                 {
-                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, updateRectangle);
+                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, _isRangeError ? imageRectangle : updateRectangle);
                 }
                 catch (Exception ex)
                 {
+                    _isRangeError = true;
                     drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, imageRectangle);
                 }
                 finally
