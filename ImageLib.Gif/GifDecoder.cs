@@ -67,14 +67,13 @@ namespace ImageLib.Gif
             }
         }
 
-        private class FrameProperties
+        internal class FrameProperties
         {
-            private bool _isDecode = false;
+            private WeakReference<PixelDataProvider> _pixelDataProvider = null;
             public readonly Rect Rect;
             public readonly double DelayMilliseconds;
             public readonly bool ShouldDispose;
             public readonly uint FrameIndex;
-            public byte[] Pixels { get; private set; }
 
             public FrameProperties(uint frameIndex, Rect rect, double delayMilliseconds, bool shouldDispose)
             {
@@ -86,26 +85,27 @@ namespace ImageLib.Gif
 
             public async Task<byte[]> DecodeAsync(BitmapDecoder bitmapDecoder)
             {
-                if (_isDecode)
+                PixelDataProvider pixelData = null;
+                if (_pixelDataProvider != null && _pixelDataProvider.TryGetTarget(out pixelData))
                 {
-                    return this.Pixels;
+                    return pixelData.DetachPixelData();
                 }
+
                 var frame = await bitmapDecoder.GetFrameAsync(FrameIndex).AsTask().ConfigureAwait(false);
-                var pixelData = await frame.GetPixelDataAsync(
-                    BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Premultiplied,
-                    new BitmapTransform(),
-                    ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage
-                    ).AsTask().ConfigureAwait(false);
-                this.Pixels = pixelData.DetachPixelData();
-                _isDecode = true;
-                return Pixels;
+                pixelData = await frame.GetPixelDataAsync(
+                   BitmapPixelFormat.Bgra8,
+                   BitmapAlphaMode.Premultiplied,
+                   new BitmapTransform(),
+                   ExifOrientationMode.IgnoreExifOrientation,
+                   ColorManagementMode.DoNotColorManage
+                   ).AsTask().ConfigureAwait(false);
+                _pixelDataProvider = new WeakReference<PixelDataProvider>(pixelData);
+                return pixelData.DetachPixelData();
             }
 
             public void ReleasePixels()
             {
-                this.Pixels = null;
+                _pixelDataProvider = null;
             }
 
 
@@ -146,6 +146,8 @@ namespace ImageLib.Gif
 
             var bitmapDecoder = await BitmapDecoder.
                 CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream).AsTask(cancellationTokenSource.Token).ConfigureAwait(false);
+
+
             var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
             var frameProperties = new List<FrameProperties>();
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
