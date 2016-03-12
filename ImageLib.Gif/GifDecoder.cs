@@ -128,7 +128,6 @@ namespace ImageLib.Gif
         private bool _hasCanvasResources;
         private CoreDispatcher _dispatcher;
 
-        private bool _isRangeError = false;
 
 
         public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
@@ -157,7 +156,6 @@ namespace ImageLib.Gif
             _bitmapDecoder = bitmapDecoder;
             _imageProperties = imageProperties;
             _dispatcher = dispatcher;
-            _isRangeError = false;
 
             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {
@@ -254,13 +252,28 @@ namespace ImageLib.Gif
             //var pixels = await this.DecodePixelAsync((uint)frameIndex);
             var pixels = await frameProperties.DecodeAsync(_bitmapDecoder);
             var frameRectangle = frameProperties.Rect;
-            var shouldClear = disposeRequested || frameIndex == 0;
+            var disposeRectangle = Rect.Empty;
+
+            if (frameIndex > 0)
+            {
+                var previousFrameProperties = _frameProperties[frameIndex - 1];
+                if (previousFrameProperties.ShouldDispose)
+                {
+                    // Clear the pixels from the last frame
+                    disposeRectangle = previousFrameProperties.Rect;
+                }
+            }
+            else
+            {
+                disposeRectangle = new Rect(0, 0, _imageProperties.PixelWidth, _imageProperties.PixelHeight);
+            }
+
 
             // Compose and display the frame
             try
             {
-                PrepareFrame(pixels, frameRectangle, shouldClear);
-                UpdateImageSource(pixels, frameRectangle, shouldClear);
+                PrepareFrame(pixels, frameRectangle, disposeRectangle);
+                UpdateImageSource(pixels, frameRectangle);
             }
             catch (Exception e) when (_canvasImageSource.Device.IsDeviceLost(e.HResult))
             {
@@ -337,7 +350,7 @@ namespace ImageLib.Gif
             }
         }
 
-        private void PrepareFrame(byte[] pixels, Rect frameRectangle, bool clearAccumulation)
+        private void PrepareFrame(byte[] pixels, Rect frameRectangle, Rect disposeRectangle)
         {
             var sharedDevice = GetSharedDevice();
 
@@ -355,9 +368,12 @@ namespace ImageLib.Gif
             {
                 using (frameBitmap)
                 {
-                    if (clearAccumulation)
+                    if (!disposeRectangle.IsEmpty)
                     {
-                        drawingSession.Clear(Colors.Transparent);
+                        using (drawingSession.CreateLayer(1.0f, disposeRectangle))
+                        {
+                            drawingSession.Clear(Colors.Transparent);
+                        }
                     }
                     drawingSession.DrawImage(frameBitmap, frameRectangle);
                 }
@@ -365,38 +381,17 @@ namespace ImageLib.Gif
 
         }
 
-        private void UpdateImageSource(byte[] pixels, Rect updateRectangle, bool clearAccumulation)
+        private void UpdateImageSource(byte[] pixels, Rect updateRectangle)
         {
             if (Window.Current.Visible)
             {
                 var imageRectangle = new Rect(new Point(), _canvasImageSource.Size);
-
                 updateRectangle.Intersect(imageRectangle);
 
-                if (updateRectangle.IsEmpty)
+                using (var drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent))
                 {
-                    updateRectangle = imageRectangle;
+                    drawingSession.DrawImage(_accumulationRenderTarget); // Render target has the composed frame
                 }
-
-                CanvasDrawingSession drawingSession = null;
-                try
-                {
-                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, _isRangeError ? imageRectangle : updateRectangle);
-                }
-                catch (Exception ex)
-                {
-                    _isRangeError = true;
-                    drawingSession = _canvasImageSource.CreateDrawingSession(Colors.Transparent, imageRectangle);
-                }
-                finally
-                {
-                    if (drawingSession != null)
-                    {
-                        drawingSession.DrawImage(_accumulationRenderTarget); // Render target has the composed frame
-                        drawingSession.Dispose();
-                    }
-                }
-
             }
         }
 
@@ -548,7 +543,6 @@ namespace ImageLib.Gif
                 _isInitialized = false;
                 _hasCanvasResources = false;
                 _bitmapDecoder = null;
-                _isRangeError = false;
                 if (_frameProperties != null)
                 {
                     foreach (var item in _frameProperties)
