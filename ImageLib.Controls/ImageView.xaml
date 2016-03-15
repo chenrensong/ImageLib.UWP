@@ -11,7 +11,7 @@
 
     <Image
         x:Name="_image"
-        Stretch="{x:Bind Stretch}"
+        Stretch="{x:Bind Stretch,Mode=OneWay}"
         VerticalAlignment="{x:Bind VerticalAlignment}"
         HorizontalAlignment="{x:Bind HorizontalAlignment}"
         Loaded="OnLoaded"
