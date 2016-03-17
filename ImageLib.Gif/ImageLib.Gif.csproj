@@ -111,12 +111,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Properties\ImageLib.Gif.rd.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ImageLib\ImageLib.csproj">
-      <Project>{13258fbc-ed4a-476c-a0f3-bccf82177476}</Project>
-      <Name>ImageLib</Name>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

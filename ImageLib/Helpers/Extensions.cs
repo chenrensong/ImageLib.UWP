@@ -59,6 +59,13 @@ namespace ImageLib.Helpers
                         var file = await StorageFile.GetFileFromPathAsync(uri.LocalPath);
                         return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
                     }
+                case "http":
+                case "https":
+                    {
+                        var httpClient = new AsyncHttpClient();
+                        var rsp = await httpClient.Uri(uri).Get();
+                        return await rsp.GetRandomStream();
+                    }
                 default:
                     {
                         try
@@ -68,16 +75,7 @@ namespace ImageLib.Helpers
                         }
                         catch (Exception ex)
                         {
-                            try
-                            {
-                                AsyncHttpClient httpClient = new AsyncHttpClient();
-                                var rsp = await httpClient.Uri(uri).Get();
-                                return await rsp.GetRandomStream();
-                            }
-                            catch (Exception hex)
-                            {
-                                return null;
-                            }
+                            return null;
                         }
                     }
             }

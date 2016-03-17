@@ -31,6 +31,16 @@ void WebpCodec::GetInfo(const Array<byte> ^data, __RPC__deref_out_opt int* width
 	WebPGetInfo(data->Data, data->Length, width, height);
 }
 
+Array<byte> ^ WebpCodec::Parse(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height) {
+	if (!WebPGetInfo(data->Data, data->Length, width, height)) {
+		return nullptr;
+	}
+	byte* pixels = WebPDecodeBGRA(data->Data, data->Length, width, height);
+	Array<byte>^ pixelsArray = ref new Array<byte>(pixels, *width * *height * 4);
+	delete pixels;
+	return pixelsArray;
+}
+
 WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
 	int width = 0;
 	int height = 0;
