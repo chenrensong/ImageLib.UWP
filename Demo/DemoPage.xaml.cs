@@ -37,5 +37,10 @@ namespace Demo
         {
             GC.Collect();
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            test.Stretch = Stretch.Fill;
+        }
     }
 }
