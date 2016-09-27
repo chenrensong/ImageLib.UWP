@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using ImageLib.Cache;
 using ImageLib.Cache.Memory;
 using ImageLib.Cache.Storage;
@@ -20,7 +19,22 @@ namespace ImageLib
 
         private ImageConfig(Builder builder)
         {
-            CacheMode = builder.CacheMode;
+            if (builder.MemoryCacheImpl == null && builder.StorageCacheImpl == null)
+            {
+                CacheMode = CacheMode.NoCache;
+            }
+            else if (builder.MemoryCacheImpl == null && builder.StorageCacheImpl != null)
+            {
+                CacheMode = CacheMode.OnlyStorageCache;
+            }
+            else if (builder.MemoryCacheImpl != null && builder.StorageCacheImpl == null)
+            {
+                CacheMode = CacheMode.OnlyMemoryCache;
+            }
+            else
+            {
+                CacheMode = CacheMode.MemoryAndStorageCache;
+            }
             MemoryCacheImpl = builder.MemoryCacheImpl;
             StorageCacheImpl = builder.StorageCacheImpl;
             DecoderTypes = builder.DecoderTypes;
@@ -33,7 +47,6 @@ namespace ImageLib
         /// <see cref="http://en.wikipedia.org/wiki/Builder_pattern"/>
         public class Builder
         {
-
             /// <summary>
             /// Cache Mode
             /// </summary>
@@ -42,13 +55,7 @@ namespace ImageLib
             /// <summary>
             /// Decoder Types
             /// </summary>
-            private List<Type> _decoderTypes = new List<Type>();
-
-            /// <summary>
-            /// Gets/Sets caching mode for ImageLoader
-            /// Default - CacheMode.MemoryAndStorageCache
-            /// </summary>
-            public CacheMode CacheMode { get { return _cacheMode; } set { _cacheMode = value; } }
+            private readonly List<Type> _decoderTypes = new List<Type>();
 
             /// <summary>
             /// Gets/Sets memory cache implementation for ImageLoader
@@ -71,14 +78,15 @@ namespace ImageLib
                 {
                     return _decoderTypes;
                 }
-                set
-                {
-                    _decoderTypes = value;
-                }
             }
 
             public Builder AddDecoder<TDecoder>() where TDecoder : IImageDecoder
             {
+                if (typeof(TDecoder) == typeof(DefaultDecoder))
+                {
+                    new ArgumentException("DefaultDecoder is default decoder");
+                }
+
                 if (!_decoderTypes.Contains(typeof(TDecoder)))
                 {
                     _decoderTypes.Add(typeof(TDecoder));
@@ -88,23 +96,10 @@ namespace ImageLib
 
             public ImageConfig Build()
             {
-                CheckParams();
+                AddDecoder<DefaultDecoder>();//添加默认Decoder
                 return new ImageConfig(this);
             }
 
-            private void CheckParams()
-            {
-                if ((CacheMode == CacheMode.MemoryAndStorageCache ||
-                    CacheMode == CacheMode.OnlyMemoryCache) && MemoryCacheImpl == null)
-                {
-                    throw new ArgumentException("CacheMode " + CacheMode + " requires MemoryCacheImpl");
-                }
-                if ((CacheMode == CacheMode.MemoryAndStorageCache ||
-                    CacheMode == CacheMode.OnlyStorageCache) && StorageCacheImpl == null)
-                {
-                    throw new ArgumentException("CacheMode " + CacheMode + " requires StorageCacheImpl");
-                }
-            }
         }
     }
 }

@@ -22,11 +22,26 @@ namespace ImageLib.Cache.Memory
         /// </summary>
         protected int _capacity;
 
-
-
         public LRUCache(int capacity = 20)
         {
             this._capacity = capacity;
+        }
+
+        public TValue this[TKey key]
+        {
+            get
+            {
+                TValue result;
+                if (TryGetValue(key, out result))
+                    return result;
+                throw new KeyNotFoundException();
+            }
+        }
+
+        public bool ContainsKey(TKey key)
+        {
+            TValue dummy;
+            return TryGetValue(key, out dummy);
         }
 
         public override TValue Get(TKey key)
@@ -85,9 +100,6 @@ namespace ImageLib.Cache.Memory
             _lruList.Clear();
         }
 
-
-
-
         /// <summary>
         /// 检测目前内存大小
         /// </summary>
@@ -98,6 +110,15 @@ namespace ImageLib.Cache.Memory
                 RemoveFirst();
             }
             return true;
+        }
+
+        public void Remove(TKey key)
+        {
+            LinkedListNode<LRUCacheItem<TKey, TValue>> node;
+            if (_cacheMap.TryGetValue(key, out node))
+            {
+                _lruList.Remove(node);
+            }
         }
 
         protected virtual void RemoveNode(LinkedListNode<LRUCacheItem<TKey, TValue>> node)

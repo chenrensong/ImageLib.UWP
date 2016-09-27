@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using System.Runtime.InteropServices.WindowsRuntime;
 using WebpLib;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Controls;
 
 namespace ImageLib.Webp
 {
@@ -30,25 +31,36 @@ namespace ImageLib.Webp
             }
         }
 
+        public int Priority
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public void Dispose()
         {
             //empty
         }
 
-        public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher, IRandomAccessStream streamSource,
+        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, IRandomAccessStream streamSource,
              CancellationTokenSource cancellationTokenSource)
         {
             byte[] bytes = new byte[streamSource.Size];
             await streamSource.ReadAsync(bytes.AsBuffer(), (uint)streamSource.Size, InputStreamOptions.None).AsTask(cancellationTokenSource.Token);
-            WriteableBitmap writeableBitmap = WebpCodec.Decode(bytes);
-            ExtendImageSource imageSource = new ExtendImageSource();
-            if (writeableBitmap != null)
+            int width, height;
+            WriteableBitmap writeableBitmap = null;
+            if (WebpCodec.GetInfo(bytes, out width, out height))
             {
-                imageSource.PixelWidth = writeableBitmap.PixelWidth;
-                imageSource.PixelHeight = writeableBitmap.PixelHeight;
-                imageSource.ImageSource = writeableBitmap;
+                writeableBitmap = new WriteableBitmap(width, height);
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                 {
+                     image.Source = writeableBitmap;
+                 });
+                WebpCodec.Decode(writeableBitmap, bytes);
             }
-            return imageSource;
+            return new ImagePackage(this, writeableBitmap, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight);
         }
 
 

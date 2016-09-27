@@ -36,7 +36,6 @@ namespace Demo
             this.Suspending += OnSuspending;
             ImageLoader.Initialize(new ImageConfig.Builder()
             {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
                 MemoryCacheImpl = new LRUMemoryCache(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
@@ -44,7 +43,6 @@ namespace Demo
 
             ImageLoader.Register("test", new ImageConfig.Builder()
             {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
                 MemoryCacheImpl = new LRUMemoryCache(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
                 "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)

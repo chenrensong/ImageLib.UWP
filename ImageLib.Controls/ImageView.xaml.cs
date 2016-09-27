@@ -18,7 +18,8 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Linq;
 using ImageLib.IO;
 using Windows.ApplicationModel;
-using Windows.Graphics.Imaging;
+using System.Collections.Generic;
+using ImageLib.Cache.Memory;
 
 namespace ImageLib.Controls
 {
@@ -39,6 +40,11 @@ namespace ImageLib.Controls
         /// </summary>
         public event EventHandler<Exception> LoadingFailed;
         #endregion
+
+        /// <summary>
+        /// 默认Cache 20 条数据
+        /// </summary>
+        private readonly static LRUCache<string, ImagePackage> PackageCaches = new LRUCache<string, ImagePackage>();
 
         public static DependencyProperty StretchProperty { get; } = DependencyProperty.Register(
             nameof(Stretch),
@@ -76,7 +82,6 @@ namespace ImageLib.Controls
             get { return GetValue(ImageLoaderKeyProperty) as string; }
             set { SetValue(ImageLoaderKeyProperty, value); }
         }
-
 
         public bool IsLoading
         {
@@ -128,8 +133,8 @@ namespace ImageLib.Controls
             }
         }
 
-        private IImageDecoder _imageDecoder;
         private bool _isControlLoaded;
+        private ImagePackage _imagePackage;
         private CancellationTokenSource _initializationCancellationTokenSource;
 
         public ImageView()
@@ -145,101 +150,114 @@ namespace ImageLib.Controls
 
         private async Task UpdateSourceAsync()
         {
-            _imageDecoder?.Dispose();
             _initializationCancellationTokenSource?.Cancel();
             _image.Source = null;
             this.PixelHeight = 0d;
             this.PixelWidth = 0d;
-            Interlocked.Exchange(ref _imageDecoder, null);
-            if (UriSource != null)
+            Interlocked.Exchange(ref _imagePackage, null);
+            var uriSource = UriSource;
+            if (uriSource == null)
             {
-                var uriSource = UriSource;
-                var cancellationTokenSource = new CancellationTokenSource();
-                _initializationCancellationTokenSource = cancellationTokenSource;
-                try
-                {
-                    this.OnLoadingStarted();
-                    var imageSource = await LoadImageByUri(uriSource, cancellationTokenSource);
-                    if (uriSource.Equals(UriSource))
-                    {
-                        _image.Source = imageSource;
-                    }
-                    else
-                    {
-                        //不处理此情况
-                    }
-                    this.OnLoadingCompleted(imageSource);
-                }
-                catch (TaskCanceledException)
-                {
-                    // Task Canceled
-                }
-                catch (FileNotFoundException fnfex)
-                {
-                    this.OnFail(fnfex);
-                }
-                catch (Exception ex)
-                {
-                    this.OnFail(ex);
-                }
+                return;
+            }
+            var cancellationTokenSource = new CancellationTokenSource();
+            _initializationCancellationTokenSource = cancellationTokenSource;
+            try
+            {
+                this.OnLoadingStarted();
+                var imageSource = await RequestUri(_image, uriSource, cancellationTokenSource);
+                this.OnLoadingCompleted(imageSource);
+            }
+            catch (TaskCanceledException)
+            {
+                // Task Canceled
+            }
+            catch (FileNotFoundException fnfex)
+            {
+                this.OnFail(fnfex);
+            }
+            catch (Exception ex)
+            {
+                this.OnFail(ex);
             }
         }
 
 
-        private async Task<ImageSource> LoadImageByUri(Uri uriSource, CancellationTokenSource cancellationTokenSource)
+        /// <summary>
+        /// 根据Uri获取ImageSource
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="uriSource"></param>
+        /// <param name="cancellationTokenSource"></param>
+        /// <returns></returns>
+        private async Task<ImageSource> RequestUri(Image image, Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
+
+            //Debug模式不允许Decoders,直接采用默认方案
+            if (DesignMode.DesignModeEnabled)
+            {
+                image.Source = new BitmapImage(uriSource);
+                return null;
+            }
 
             var randStream = await this.CurrentLoader.LoadImageStream(uriSource, cancellationTokenSource);
             if (randStream == null)
             {
                 throw new Exception("stream is null");
             }
+
             ImageSource imageSource = null;
-            bool hasDecoder = false;
-            //debug模式不允许Decoders,直接采用默认方案
-            if (!DesignMode.DesignModeEnabled)
+            if (PackageCaches.ContainsKey(uriSource.AbsoluteUri))
             {
-                var decoders = this.CurrentLoader.GetAvailableDecoders();
-                if (decoders.Count > 0)
+                var temp = PackageCaches[uriSource.AbsoluteUri];
+                if (temp.ImageSource != null)
                 {
-                    int maxHeaderSize = decoders.Max(x => x.HeaderSize);
-                    if (maxHeaderSize > 0)
+                    Interlocked.Exchange(ref _imagePackage, temp);
+                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        byte[] header = new byte[maxHeaderSize];
-                        var readStream = randStream.AsStreamForRead();
-                        readStream.Position = 0;
-                        await readStream.ReadAsync(header, 0, maxHeaderSize);
-                        readStream.Position = 0;
-                        var decoder = decoders.FirstOrDefault(x => x.IsSupportedFileFormat(header));
-                        if (decoder != null)
+                        _image.Source = temp.ImageSource;
+                        temp.Decoder?.Start();
+                    });
+                    return temp.ImageSource;
+                }
+                PackageCaches.Remove(uriSource.AbsoluteUri);
+            }
+
+            var decoders = this.CurrentLoader.GetAvailableDecoders();
+            if (decoders.Count > 0)
+            {
+                int maxHeaderSize = decoders.Max(x => x.HeaderSize);
+                if (maxHeaderSize > 0)
+                {
+                    byte[] header = new byte[maxHeaderSize];
+                    var readStream = randStream.AsStreamForRead();
+                    readStream.Position = 0;
+                    await readStream.ReadAsync(header, 0, maxHeaderSize);
+                    readStream.Position = 0;
+                    var decoder = decoders.Where(x => x.IsSupportedFileFormat(header)).OrderByDescending(m => m.Priority).FirstOrDefault();
+                    if (decoder != null)
+                    {
+                        var package = await decoder.InitializeAsync(this.Dispatcher, _image, randStream, cancellationTokenSource);
+                        imageSource = package.ImageSource;
+                        this.PixelHeight = package.PixelHeight;
+                        this.PixelWidth = package.PixelWidth;
+                        if (!cancellationTokenSource.IsCancellationRequested)
                         {
-                            var source = await decoder.InitializeAsync(this.Dispatcher, randStream,
-                                    cancellationTokenSource);
-                            imageSource = source.ImageSource;
-                            this.PixelHeight = source.PixelHeight;
-                            this.PixelWidth = source.PixelWidth;
-                            if (!cancellationTokenSource.IsCancellationRequested)
+                            Interlocked.Exchange(ref _imagePackage, package);
+                            if (_isControlLoaded)
                             {
-                                _imageDecoder?.Dispose();
-                                Interlocked.Exchange(ref _imageDecoder, decoder);
-                                if (_isControlLoaded)
-                                {
-                                    _imageDecoder.Start();
-                                }
+                                _imagePackage?.Decoder?.Start();
                             }
-                            hasDecoder = true;
+                        }
+
+                        if (!PackageCaches.ContainsKey(uriSource.AbsoluteUri))
+                        {
+                            PackageCaches.Put(uriSource.AbsoluteUri, package);
                         }
                     }
                 }
             }
-            if (!hasDecoder)
-            {
-                var bitmapImage = new BitmapImage();
-                await bitmapImage.SetSourceAsync(randStream).AsTask(cancellationTokenSource.Token);
-                this.PixelHeight = bitmapImage.PixelHeight;
-                this.PixelWidth = bitmapImage.PixelWidth;
-                imageSource = bitmapImage;
-            }
+
             return imageSource;
 
         }
@@ -279,11 +297,11 @@ namespace ImageLib.Controls
         {
             if (e.Visible)
             {
-                _imageDecoder?.Start();
+                _imagePackage?.Decoder?.Start();
             }
             else if (!e.Visible)
             {
-                _imageDecoder?.Stop(); // Prevent unnecessary work
+                _imagePackage?.Decoder?.Stop(); // Prevent unnecessary work
             }
         }
 
@@ -294,7 +312,7 @@ namespace ImageLib.Controls
             // Register for SurfaceContentsLost to recreate the image source if necessary
             CompositionTarget.SurfaceContentsLost += OnSurfaceContentsLost;
             _isControlLoaded = true;
-            _imageDecoder?.Start();
+            _imagePackage?.Decoder?.Start();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -305,12 +323,13 @@ namespace ImageLib.Controls
             _isControlLoaded = false;
             _initializationCancellationTokenSource?.Cancel();
             _image.Source = null;
-            _imageDecoder?.Dispose();
+            _imagePackage?.Decoder?.Stop();
         }
 
         private void OnSurfaceContentsLost(object sender, object e)
         {
-            var source = _imageDecoder?.RecreateSurfaces();
+            var source = _imagePackage?.Decoder?.RecreateSurfaces();
+            _imagePackage.UpdateSource(source);
             if (source != null)
             {
                 _image.Source = source;
@@ -319,12 +338,12 @@ namespace ImageLib.Controls
 
         public void Stop()
         {
-            _imageDecoder?.Stop();
+            _imagePackage?.Decoder?.Stop();
         }
 
         public void Start()
         {
-            _imageDecoder?.Start();
+            _imagePackage?.Decoder?.Start();
         }
 
         #endregion

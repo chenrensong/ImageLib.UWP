@@ -11,12 +11,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
 namespace ImageLib.IO
 {
     public interface IImageDecoder : IDisposable
     {
+        int Priority { get; }
 
         /// <summary>
         /// Gets the size of the header for this image type.
@@ -59,7 +61,7 @@ namespace ImageLib.IO
         /// <param name="dispatcher">用于UI线程绘制</param>
         /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
+        Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
 
     }

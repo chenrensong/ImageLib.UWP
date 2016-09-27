@@ -21,6 +21,7 @@ using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
 
@@ -36,6 +37,14 @@ namespace ImageLib.Gif
             get
             {
                 return 6;
+            }
+        }
+
+        public int Priority
+        {
+            get
+            {
+                return 0;
             }
         }
 
@@ -110,6 +119,42 @@ namespace ImageLib.Gif
 
         #endregion
 
+
+        private class LazyFrameCollection : SortedList<int, FrameProperties>
+        {
+            private SortedList<int, Func<Task<FrameProperties>>> _funcCollection =
+                new SortedList<int, Func<Task<FrameProperties>>>();
+
+            public void Add(int index, Func<Task<FrameProperties>> func)
+            {
+                _funcCollection.Add(index, func);
+            }
+
+            public async Task<FrameProperties> Get(int index)
+            {
+                if (!this.ContainsKey(index))
+                {
+                    var func = _funcCollection[index];
+                    var frameProperties = await func.Invoke();
+                    _funcCollection.Remove(index);//clear invoked func
+                    this.Add(index, frameProperties);
+                }
+                return base[index];
+            }
+
+            /// <summary>
+            /// 释放资源
+            /// </summary>
+            public void Release()
+            {
+                foreach (var item in this)
+                {
+                    item.Value.Release();
+                }
+            }
+        }
+
+
         private DispatcherTimer _animationTimer;
 
         private int _currentFrameIndex;
@@ -118,7 +163,7 @@ namespace ImageLib.Gif
 
         private BitmapDecoder _bitmapDecoder;
         private ImageProperties _imageProperties;
-        private IList<FrameProperties> _frameProperties;
+        private LazyFrameCollection _frameProperties;
 
         private CanvasImageSource _canvasImageSource;
         private CanvasRenderTarget _accumulationRenderTarget;
@@ -130,10 +175,9 @@ namespace ImageLib.Gif
 
 
 
-        public async Task<ExtendImageSource> InitializeAsync(CoreDispatcher dispatcher,
+        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
         {
-
             var inMemoryStream = new InMemoryRandomAccessStream();
             var copyAction = RandomAccessStream.CopyAndCloseAsync(
                            streamSource.GetInputStreamAt(0L),
@@ -143,13 +187,18 @@ namespace ImageLib.Gif
             var bitmapDecoder = await BitmapDecoder.
                 CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream).AsTask(cancellationTokenSource.Token).ConfigureAwait(false);
 
-
             var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
-            var frameProperties = new List<FrameProperties>();
+            var frameProperties = new LazyFrameCollection();
+
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
             {
                 var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask(cancellationTokenSource.Token).ConfigureAwait(false); ;
-                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
+                uint temp = i;
+                frameProperties.Add((int)temp, async () =>
+                {
+                    return await RetrieveFramePropertiesAsync(temp, bitmapFrame);
+                });
+                //frameProperties.Add((int)i, await RetrieveFramePropertiesAsync(i, bitmapFrame));
             }
 
             _frameProperties = frameProperties;
@@ -160,18 +209,11 @@ namespace ImageLib.Gif
             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {
                  CreateCanvasResources();
+                 image.Source = _canvasImageSource;
              });
 
             _isInitialized = true;
-            ExtendImageSource imageSource = new ExtendImageSource();
-            if (_canvasImageSource != null)
-            {
-                imageSource.PixelWidth = _imageProperties.PixelWidth;
-                imageSource.PixelHeight = _imageProperties.PixelHeight;
-                imageSource.ImageSource = _canvasImageSource;
-            }
-
-            return imageSource;
+            return new ImagePackage(this, _canvasImageSource, _imageProperties.PixelWidth, _imageProperties.PixelHeight); ;
         }
 
         public void Start()
@@ -197,7 +239,7 @@ namespace ImageLib.Gif
         {
             try
             {
-                await AdvanceFrame();
+                await FrameLooper();
             }
             catch (Exception ex)
             {
@@ -207,12 +249,16 @@ namespace ImageLib.Gif
 
         public void Stop()
         {
+            if (!_isAnimating)
+            {
+                return;
+            }
             _animationTimer?.Stop();
             _isAnimating = false;
         }
 
 
-        private async Task AdvanceFrame()
+        private async Task FrameLooper()
         {
 
             if (!_isInitialized || _bitmapDecoder.FrameCount == 0)
@@ -220,11 +266,9 @@ namespace ImageLib.Gif
                 return;
             }
 
-
             var frameIndex = _currentFrameIndex;
-            var frameProperties = _frameProperties[frameIndex];
+            var frameProperties = await _frameProperties.Get(frameIndex);
             var disposeRequested = _disposeRequested;
-
 
             // Increment frame index and loop count
             _currentFrameIndex++;
@@ -256,7 +300,7 @@ namespace ImageLib.Gif
 
             if (frameIndex > 0)
             {
-                var previousFrameProperties = _frameProperties[frameIndex - 1];
+                var previousFrameProperties = await _frameProperties.Get(frameIndex - 1);
                 if (previousFrameProperties.ShouldDispose)
                 {
                     // Clear the pixels from the last frame
@@ -275,7 +319,7 @@ namespace ImageLib.Gif
                 PrepareFrame(pixels, frameRectangle, disposeRectangle);
                 UpdateImageSource(pixels, frameRectangle);
             }
-            catch (Exception e) when (_canvasImageSource.Device.IsDeviceLost(e.HResult))
+            catch (Exception ex) when (_canvasImageSource.Device.IsDeviceLost(ex.HResult))
             {
                 // XAML will also raise a SurfaceContentsLost event, and we use this to trigger
                 // redrawing the surface. Therefore, ignore this error.
@@ -545,10 +589,7 @@ namespace ImageLib.Gif
                 _bitmapDecoder = null;
                 if (_frameProperties != null)
                 {
-                    foreach (var item in _frameProperties)
-                    {
-                        item.Release();
-                    }
+                    _frameProperties.Release();
                     _frameProperties.Clear();
                     _frameProperties = null;
                 }

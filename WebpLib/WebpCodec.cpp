@@ -23,12 +23,13 @@ using Windows::Devices::Enumeration::DeviceInformationCollection;
 using namespace Microsoft::WRL;
 using namespace ABI::Windows::Foundation;
 
+
 WebpCodec::WebpCodec()
 {
 }
 
-void WebpCodec::GetInfo(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height) {
-	WebPGetInfo(data->Data, data->Length, width, height);
+bool WebpCodec::GetInfo(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height) {
+	return WebPGetInfo(data->Data, data->Length, width, height) ? true : false;
 }
 
 Array<byte> ^ WebpCodec::Parse(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height) {
@@ -41,15 +42,10 @@ Array<byte> ^ WebpCodec::Parse(const Array<byte> ^data, __RPC__deref_out_opt int
 	return pixelsArray;
 }
 
-WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
-	int width = 0;
-	int height = 0;
-	if (!WebPGetInfo(data->Data, data->Length, &width, &height)) {
-		return nullptr;
-	}
-
+WriteableBitmap^ WebpCodec::Decode(WriteableBitmap^  bitmap, const Array<byte> ^data) {
+	int width = bitmap->PixelWidth;
+	int height = bitmap->PixelHeight;
 	byte* pixels = WebPDecodeBGRA(data->Data, data->Length, &width, &height);
-	WriteableBitmap^ bitmap = ref new WriteableBitmap(width, height);
 	IBuffer^ buffer = bitmap->PixelBuffer;
 	ComPtr<IBufferByteAccess> pBufferByteAccess;
 	ComPtr<IUnknown> pBuffer((IUnknown*)buffer);
@@ -59,5 +55,16 @@ WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
 	memcpy(sourcePixels, (void *)pixels, width * height * 4);
 	bitmap->Invalidate();
 	delete pixels;
+	return bitmap;
+}
+
+WriteableBitmap^ WebpCodec::Decode(const Array<byte> ^data) {
+	int width = 0;
+	int height = 0;
+	if (!WebPGetInfo(data->Data, data->Length, &width, &height)) {
+		return nullptr;
+	}
+	WriteableBitmap^ bitmap = ref new WriteableBitmap(width, height);
+	Decode(bitmap, data);
 	return bitmap;
 }

@@ -78,8 +78,7 @@ namespace ImageLib.Cache.Memory
         /// cannot be relied upon to guarantee the number of objects that would be discovered via
         /// enumeration. Treat the Count as an estimate only.
         /// </remarks>
-        public void Add(TKey key,
-                        TValue value)
+        public void Add(TKey key,TValue value)
         {
             TValue dummy;
 
@@ -163,8 +162,7 @@ namespace ImageLib.Cache.Memory
         /// <param name="key">The key</param>
         /// <param name="value">The value</param>
         /// <returns>Returns true if the value was present; false otherwise.</returns>
-        public bool TryGetValue(TKey key,
-                           out TValue value)
+        public bool TryGetValue(TKey key, out TValue value)
         {
             value = default(TValue);
             WeakReference wr;
