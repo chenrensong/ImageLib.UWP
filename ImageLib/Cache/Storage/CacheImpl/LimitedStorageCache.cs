@@ -14,8 +14,7 @@ namespace ImageLib.Cache.Storage.CacheImpl
         /// <summary>
         /// Dictionary contains pairs of filePath and last access time in unix timestamp * 1000 (DateTime.Millisecond)
         /// </summary>
-        private readonly IDictionary<string, long> _lastAccessTimeDictionary =
-            new SynchronizedDictionary<string, long>();
+        private readonly IDictionary<string, long> _lastAccessTimeDictionary = new SynchronizedDictionary<string, long>();
 
         private readonly object _lockObject = new object();
 

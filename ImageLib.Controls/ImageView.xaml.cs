@@ -15,11 +15,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using System.Linq;
-using ImageLib.IO;
 using Windows.ApplicationModel;
-using System.Collections.Generic;
-using ImageLib.Cache.Memory;
 
 namespace ImageLib.Controls
 {
@@ -41,10 +37,6 @@ namespace ImageLib.Controls
         public event EventHandler<Exception> LoadingFailed;
         #endregion
 
-        /// <summary>
-        /// 默认Cache 20 条数据
-        /// </summary>
-        private readonly static LRUCache<string, ImagePackage> PackageCaches = new LRUCache<string, ImagePackage>();
 
         public static DependencyProperty StretchProperty { get; } = DependencyProperty.Register(
             nameof(Stretch),
@@ -192,7 +184,6 @@ namespace ImageLib.Controls
         /// <returns></returns>
         private async Task<ImageSource> RequestUri(Image image, Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
-
             //Debug模式不允许Decoders,直接采用默认方案
             if (DesignMode.DesignModeEnabled)
             {
@@ -200,66 +191,24 @@ namespace ImageLib.Controls
                 return null;
             }
 
-            var randStream = await this.CurrentLoader.LoadImageStream(uriSource, cancellationTokenSource);
-            if (randStream == null)
+            image.Source = null;
+            var package = await this.CurrentLoader.LoadImage(image, uriSource, cancellationTokenSource);
+            Interlocked.Exchange(ref _imagePackage, null);
+            if (package == null)
             {
-                throw new Exception("stream is null");
+                throw new Exception("package is null");
             }
-
-            ImageSource imageSource = null;
-            if (PackageCaches.ContainsKey(uriSource.AbsoluteUri))
-            {
-                var temp = PackageCaches[uriSource.AbsoluteUri];
-                if (temp.ImageSource != null)
-                {
-                    Interlocked.Exchange(ref _imagePackage, temp);
-                    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        _image.Source = temp.ImageSource;
-                        temp.Decoder?.Start();
-                    });
-                    return temp.ImageSource;
-                }
-                PackageCaches.Remove(uriSource.AbsoluteUri);
-            }
-
-            var decoders = this.CurrentLoader.GetAvailableDecoders();
-            if (decoders.Count > 0)
-            {
-                int maxHeaderSize = decoders.Max(x => x.HeaderSize);
-                if (maxHeaderSize > 0)
-                {
-                    byte[] header = new byte[maxHeaderSize];
-                    var readStream = randStream.AsStreamForRead();
-                    readStream.Position = 0;
-                    await readStream.ReadAsync(header, 0, maxHeaderSize);
-                    readStream.Position = 0;
-                    var decoder = decoders.Where(x => x.IsSupportedFileFormat(header)).OrderByDescending(m => m.Priority).FirstOrDefault();
-                    if (decoder != null)
-                    {
-                        var package = await decoder.InitializeAsync(this.Dispatcher, _image, randStream, cancellationTokenSource);
-                        imageSource = package.ImageSource;
-                        this.PixelHeight = package.PixelHeight;
-                        this.PixelWidth = package.PixelWidth;
-                        if (!cancellationTokenSource.IsCancellationRequested)
-                        {
-                            Interlocked.Exchange(ref _imagePackage, package);
-                            if (_isControlLoaded)
-                            {
-                                _imagePackage?.Decoder?.Start();
-                            }
-                        }
-
-                        if (!PackageCaches.ContainsKey(uriSource.AbsoluteUri))
-                        {
-                            PackageCaches.Put(uriSource.AbsoluteUri, package);
-                        }
-                    }
-                }
-            }
-
-            return imageSource;
-
+            Interlocked.Exchange(ref _imagePackage, package);
+            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+             {
+                 if (_isControlLoaded)
+                 {
+                     _imagePackage?.Decoder?.Start();
+                 }
+             });
+            this.PixelWidth = package.PixelWidth;
+            this.PixelHeight = package.PixelHeight;
+            return package.ImageSource;
         }
 
 

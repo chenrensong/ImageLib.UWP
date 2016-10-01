@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Threading.Tasks;
-using Windows.UI.Xaml.Media.Imaging;
 using ImageLib.Helpers;
 using System.Threading;
 using Windows.Storage.Streams;
@@ -11,6 +10,11 @@ using Windows.System.Threading;
 using System.Collections.ObjectModel;
 using ImageLib.IO;
 using System.Collections.Generic;
+using ImageLib.Cache.Memory;
+using System.Linq;
+using System.IO;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Core;
 
 namespace ImageLib
 {
@@ -21,6 +25,11 @@ namespace ImageLib
         /// Default - false
         /// </summary>
         internal static bool IsLogEnabled { get; set; }
+        /// <summary>
+        /// 默认Cache 20 条数据
+        /// </summary>
+        private readonly static LRUCache<string, ImagePackage> PackageCaches = new LRUCache<string, ImagePackage>();
+
         internal static readonly Dictionary<string, ImageLoader> Collection = new Dictionary<string, ImageLoader>();
         private static readonly object LockObject = new object();
         /// <summary>
@@ -108,6 +117,20 @@ namespace ImageLib
             return new ReadOnlyCollection<IImageDecoder>(decoders);
         }
 
+        /// <summary>
+        /// 清空缓存
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task ClearStorageCache()
+        {
+            CheckConfig();
+            if (_ImageConfig.StorageCacheImpl != null)
+            {
+                await _ImageConfig.StorageCacheImpl.Clear();
+            }
+        }
+
+
         protected virtual void CheckConfig()
         {
             if (_ImageConfig == null)
@@ -121,9 +144,9 @@ namespace ImageLib
         /// </summary>
         /// <param name="imageUrl">Url of the image to load</param>
         /// <returns>BitmapImage if load was successfull or null otherwise</returns>
-        public virtual async Task<BitmapImage> LoadImage(string imageUrl, CancellationTokenSource cancellationTokenSource)
+        public virtual async Task<ImagePackage> LoadImage(Image image, string imageUrl, CancellationTokenSource cancellationTokenSource)
         {
-            return await LoadImage(new Uri(imageUrl), cancellationTokenSource);
+            return await LoadImage(image, new Uri(imageUrl), cancellationTokenSource);
         }
 
         /// <summary>
@@ -131,13 +154,64 @@ namespace ImageLib
         /// </summary>
         /// <param name="imageUri">Uri of the image to load</param>
         /// <returns>BitmapImage if load was successfull or null otherwise</returns>
-        public virtual async Task<BitmapImage> LoadImage(Uri imageUri, CancellationTokenSource cancellationTokenSource)
+        public virtual async Task<ImagePackage> LoadImage(Image image, Uri imageUri,
+            CancellationTokenSource cancellationTokenSource)
         {
             CheckConfig();
-            var bitmapImage = new BitmapImage();
-            var stream = await LoadImageStream(imageUri, cancellationTokenSource);
-            await bitmapImage.SetSourceAsync(stream);
-            return bitmapImage;
+            ImagePackage imagePackage = null;
+            if (PackageCaches.ContainsKey(imageUri.AbsoluteUri))
+            {
+                imagePackage = PackageCaches[imageUri.AbsoluteUri];
+                if (imagePackage.ImageSource != null)
+                {
+                    await image.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        image.Source = imagePackage.ImageSource;
+                        //imagePackage?.Decoder?.Start();
+                    });
+                    return imagePackage;
+                }
+                PackageCaches.Remove(imageUri.AbsoluteUri);
+            }
+
+            var decoders = this.GetAvailableDecoders();
+            var randStream = await this.LoadImageStream(imageUri, cancellationTokenSource);
+            if (randStream == null)
+            {
+                throw new Exception("stream is null");
+            }
+            if (decoders.Count > 0)
+            {
+                int maxHeaderSize = decoders.Max(x => x.HeaderSize);
+                if (maxHeaderSize > 0)
+                {
+                    byte[] header = new byte[maxHeaderSize];
+                    var readStream = randStream.AsStreamForRead();
+                    readStream.Position = 0;
+                    await readStream.ReadAsync(header, 0, maxHeaderSize);
+                    readStream.Position = 0;
+                    var decoder = decoders.Where(x => x.IsSupportedFileFormat(header)).OrderByDescending(m => m.Priority).FirstOrDefault();
+                    if (decoder != null)
+                    {
+                        var package = await decoder.InitializeAsync(image.Dispatcher, image, randStream, cancellationTokenSource);
+                        if (!cancellationTokenSource.IsCancellationRequested)
+                        {
+                            imagePackage = package;
+                            //imagePackage?.Decoder?.Start();
+                        }
+                        if (!PackageCaches.ContainsKey(imageUri.AbsoluteUri))
+                        {
+                            PackageCaches.Put(imageUri.AbsoluteUri, package);
+                        }
+                    }
+                }
+            }
+            return imagePackage;
+
+            //var bitmapImage = new BitmapImage();
+            //var stream = await LoadImageStream(imageUri, cancellationTokenSource);
+            //await bitmapImage.SetSourceAsync(stream);
+            //return bitmapImage;
         }
 
         /// <summary>
