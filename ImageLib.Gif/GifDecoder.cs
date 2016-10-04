@@ -194,11 +194,11 @@ namespace ImageLib.Gif
             {
                 var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask(cancellationTokenSource.Token).ConfigureAwait(false); ;
                 uint temp = i;
-                frameProperties.Add((int)temp, async () =>
-                {
-                    return await RetrieveFramePropertiesAsync(temp, bitmapFrame);
-                });
-                //frameProperties.Add((int)i, await RetrieveFramePropertiesAsync(i, bitmapFrame));
+                //frameProperties.Add((int)temp, async () =>
+                //{
+                //    return await RetrieveFramePropertiesAsync(temp, bitmapFrame);
+                //});
+                frameProperties.Add((int)temp, await RetrieveFramePropertiesAsync(i, bitmapFrame));
             }
 
             _frameProperties = frameProperties;

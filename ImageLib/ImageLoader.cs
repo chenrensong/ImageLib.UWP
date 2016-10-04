@@ -130,6 +130,15 @@ namespace ImageLib
             }
         }
 
+        public virtual void ClearMemoryCache()
+        {
+            CheckConfig();
+            if (_ImageConfig.MemoryCacheImpl != null)
+            {
+                _ImageConfig.MemoryCacheImpl.Clear();
+            }
+        }
+
 
         protected virtual void CheckConfig()
         {
@@ -199,6 +208,7 @@ namespace ImageLib
                             imagePackage = package;
                             //imagePackage?.Decoder?.Start();
                         }
+
                         if (!PackageCaches.ContainsKey(imageUri.AbsoluteUri))
                         {
                             PackageCaches.Put(imageUri.AbsoluteUri, package);
