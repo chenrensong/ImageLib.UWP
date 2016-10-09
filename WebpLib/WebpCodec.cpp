@@ -55,6 +55,7 @@ WriteableBitmap^ WebpCodec::Decode(WriteableBitmap^  bitmap, const Array<byte> ^
 	memcpy(sourcePixels, (void *)pixels, width * height * 4);
 	bitmap->Invalidate();
 	delete pixels;
+	pixels = nullptr;
 	return bitmap;
 }
 

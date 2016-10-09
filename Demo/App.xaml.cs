@@ -9,6 +9,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -34,6 +35,7 @@ namespace Demo
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.UnhandledException += App_UnhandledException;
             ImageLoader.Initialize(new ImageConfig.Builder()
             {
                 MemoryCacheImpl = new LRUMemoryCache(),
@@ -48,6 +50,12 @@ namespace Demo
                 "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
 
+        }
+
+        private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            (new MessageDialog(e.Message)).ShowAsync();
         }
 
         /// <summary>

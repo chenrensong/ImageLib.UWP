@@ -11,11 +11,18 @@ namespace ImageLib
 {
     public class ImageConfig
     {
+        /// <summary>
+        /// 默认Config
+        /// </summary>
+        internal static ImageConfig Default;
+        internal static readonly Dictionary<string, ImageLoader> Collection = new Dictionary<string, ImageLoader>();
+
         public readonly CacheMode CacheMode;
         public readonly MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl;
         public readonly StorageCacheBase StorageCacheImpl;
         public readonly IUriParser UriParser;
         public readonly List<Type> DecoderTypes;
+        public readonly bool NewApiSupported = true;
 
         private ImageConfig(Builder builder)
         {
@@ -39,6 +46,7 @@ namespace ImageLib
             StorageCacheImpl = builder.StorageCacheImpl;
             DecoderTypes = builder.DecoderTypes;
             UriParser = builder.UriParser;
+            NewApiSupported = builder.NewApiSupported;
         }
 
         /// <summary>
@@ -47,11 +55,6 @@ namespace ImageLib
         /// <see cref="http://en.wikipedia.org/wiki/Builder_pattern"/>
         public class Builder
         {
-            /// <summary>
-            /// Cache Mode
-            /// </summary>
-            private CacheMode _cacheMode = CacheMode.MemoryAndStorageCache;
-
             /// <summary>
             /// Decoder Types
             /// </summary>
@@ -71,6 +74,8 @@ namespace ImageLib
             public StorageCacheBase StorageCacheImpl { get; set; }
 
             public IUriParser UriParser { get; set; }
+
+            internal bool NewApiSupported { get; private set; } = true;
 
             public List<Type> DecoderTypes
             {
@@ -92,6 +97,11 @@ namespace ImageLib
                     _decoderTypes.Add(typeof(TDecoder));
                 }
                 return this;
+            }
+
+            public void NewApi(bool isSupported)
+            {
+                NewApiSupported = isSupported;
             }
 
             public ImageConfig Build()

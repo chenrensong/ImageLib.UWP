@@ -31,20 +31,14 @@ namespace ImageLib.Webp
             }
         }
 
-        public int Priority
-        {
-            get
-            {
-                return 0;
-            }
-        }
 
         public void Dispose()
         {
             //empty
         }
 
-        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, IRandomAccessStream streamSource,
+        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource,
+            IRandomAccessStream streamSource,
              CancellationTokenSource cancellationTokenSource)
         {
             byte[] bytes = new byte[streamSource.Size];
@@ -56,7 +50,11 @@ namespace ImageLib.Webp
                 writeableBitmap = new WriteableBitmap(width, height);
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                  {
-                     image.Source = writeableBitmap;
+                     var uri = image.Tag as Uri;
+                     if (uri == uriSource)
+                     {
+                         image.Source = writeableBitmap;
+                     }
                  });
                 WebpCodec.Decode(writeableBitmap, bytes);
             }
@@ -64,11 +62,12 @@ namespace ImageLib.Webp
         }
 
 
-        public bool IsSupportedFileFormat(byte[] header)
+        public int GetPriority(byte[] header)
         {
-            return header != null && header.Length >= 12
+            var isSupported = header != null && header.Length >= 12
                 && header[0] == 'R' && header[1] == 'I' && header[2] == 'F' && header[3] == 'F'
                 && header[8] == 'W' && header[9] == 'E' && header[10] == 'B' && header[11] == 'P';
+            return isSupported ? 0 : -1;
         }
 
         public ImageSource RecreateSurfaces()

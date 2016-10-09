@@ -69,7 +69,6 @@
     <ClCompile Include="dsp\dec_mips32.cpp" />
     <ClCompile Include="dsp\enc_avx2.cpp" />
     <ClCompile Include="dsp\enc_mips32.cpp" />
-    <ClCompile Include="dsp\lossless_mips32.cpp" />
     <ClCompile Include="dsp\lossless_neon.cpp" />
     <ClCompile Include="dsp\lossless_sse2.cpp" />
     <ClCompile Include="dsp\yuv_mips32.cpp" />
@@ -78,6 +77,42 @@
     <ClCompile Include="enc\picture_psnr.cpp" />
     <ClCompile Include="enc\picture_rescale.cpp" />
     <ClCompile Include="enc\picture_tools.cpp" />
+    <ClCompile Include="extras\extras.cpp" />
+    <ClCompile Include="demux\anim_decode.cpp" />
+    <ClCompile Include="dsp\alpha_processing_sse41.cpp" />
+    <ClCompile Include="dsp\argb.cpp" />
+    <ClCompile Include="dsp\argb_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\argb_sse2.cpp" />
+    <ClCompile Include="dsp\cost.cpp" />
+    <ClCompile Include="dsp\cost_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\cost_mips32.cpp" />
+    <ClCompile Include="dsp\cost_sse2.cpp" />
+    <ClCompile Include="dsp\alpha_processing_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\dec_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\dec_msa.cpp" />
+    <ClCompile Include="dsp\dec_sse41.cpp" />
+    <ClCompile Include="dsp\enc_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\enc_sse41.cpp" />
+    <ClCompile Include="dsp\filters.cpp" />
+    <ClCompile Include="dsp\filters_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\filters_sse2.cpp" />
+    <ClCompile Include="dsp\lossless_enc.cpp" />
+    <ClCompile Include="dsp\lossless_enc_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\lossless_enc_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_enc_neon.cpp" />
+    <ClCompile Include="dsp\lossless_enc_sse2.cpp" />
+    <ClCompile Include="dsp\lossless_enc_sse41.cpp" />
+    <ClCompile Include="dsp\lossless_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\rescaler.cpp" />
+    <ClCompile Include="dsp\rescaler_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\rescaler_mips32.cpp" />
+    <ClCompile Include="dsp\rescaler_neon.cpp" />
+    <ClCompile Include="dsp\rescaler_sse2.cpp" />
+    <ClCompile Include="dsp\upsampling_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\yuv_mips_dsp_r2.cpp" />
+    <ClCompile Include="enc\delta_palettization.cpp" />
+    <ClCompile Include="enc\near_lossless.cpp" />
+    <ClCompile Include="mux\anim_encode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -116,9 +151,13 @@
     <ClInclude Include="webp\mux_types.h" />
     <ClInclude Include="webp\types.h" />
     <ClInclude Include="dsp\neon.h" />
-    <ClInclude Include="dsp\yuv_tables_sse2.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="dsp\Makefile.am" />
+    <ClInclude Include="dec\common.h" />
+    <ClInclude Include="dsp\common_sse2.h" />
+    <ClInclude Include="dsp\mips_macro.h" />
+    <ClInclude Include="dsp\msa_macro.h" />
+    <ClInclude Include="enc\delta_palettization.h" />
+    <ClInclude Include="utils\bit_reader_inl.h" />
+    <ClInclude Include="utils\endian_inl.h" />
+    <ClInclude Include="webp\extras.h" />
   </ItemGroup>
 </Project>

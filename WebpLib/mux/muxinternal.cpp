@@ -439,7 +439,7 @@ static int IsNotCompatible(int feature, int num_items) {
   return (feature != 0) != (num_items > 0);
 }
 
-//#define NO_FLAG 0
+#define NO_FLAG 0
 
 // Test basic constraints:
 // retrieval, maximum number of chunks by index (use -1 to skip)
@@ -495,9 +495,9 @@ WebPMuxError MuxValidate(const WebPMux* const mux) {
 
   // Animation: ANIMATION_FLAG, ANIM chunk and ANMF chunk(s) are consistent.
   // At most one ANIM chunk.
-  err = ValidateChunk(mux, IDX_ANIM, NO_FLAG, flags, 1, &num_anim);
+  err = ValidateChunk(mux, IDX_ANIM,(WebPFeatureFlags) NO_FLAG, flags, 1, &num_anim);
   if (err != WEBP_MUX_OK) return err;
-  err = ValidateChunk(mux, IDX_ANMF, NO_FLAG, flags, -1, &num_frames);
+  err = ValidateChunk(mux, IDX_ANMF, (WebPFeatureFlags)NO_FLAG, flags, -1, &num_frames);
   if (err != WEBP_MUX_OK) return err;
 
   {
@@ -516,9 +516,9 @@ WebPMuxError MuxValidate(const WebPMux* const mux) {
 
   // Verify either VP8X chunk is present OR there is only one elem in
   // mux->images_.
-  err = ValidateChunk(mux, IDX_VP8X, NO_FLAG, flags, 1, &num_vp8x);
+  err = ValidateChunk(mux, IDX_VP8X, (WebPFeatureFlags)NO_FLAG, flags, 1, &num_vp8x);
   if (err != WEBP_MUX_OK) return err;
-  err = ValidateChunk(mux, IDX_VP8, NO_FLAG, flags, -1, &num_images);
+  err = ValidateChunk(mux, IDX_VP8, (WebPFeatureFlags)NO_FLAG, flags, -1, &num_images);
   if (err != WEBP_MUX_OK) return err;
   if (num_vp8x == 0 && num_images != 1) return WEBP_MUX_INVALID_ARGUMENT;
 

@@ -35,7 +35,7 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
   </PropertyGroup>
@@ -213,25 +213,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="dec\alphai.h" />
+    <ClInclude Include="dec\common.h" />
     <ClInclude Include="dec\decode_vp8.h" />
     <ClInclude Include="dec\vp8i.h" />
     <ClInclude Include="dec\vp8li.h" />
     <ClInclude Include="dec\webpi.h" />
+    <ClInclude Include="dsp\common_sse2.h" />
     <ClInclude Include="dsp\dsp.h" />
     <ClInclude Include="dsp\lossless.h" />
+    <ClInclude Include="dsp\mips_macro.h" />
+    <ClInclude Include="dsp\msa_macro.h" />
     <ClInclude Include="dsp\neon.h" />
     <ClInclude Include="dsp\yuv.h" />
-    <ClInclude Include="dsp\yuv_tables_sse2.h" />
     <ClInclude Include="enc\backward_references.h" />
     <ClInclude Include="enc\cost.h" />
+    <ClInclude Include="enc\delta_palettization.h" />
     <ClInclude Include="enc\histogram.h" />
     <ClInclude Include="enc\vp8enci.h" />
     <ClInclude Include="enc\vp8li.h" />
     <ClInclude Include="mux\muxi.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="utils\bit_reader.h" />
+    <ClInclude Include="utils\bit_reader_inl.h" />
     <ClInclude Include="utils\bit_writer.h" />
     <ClInclude Include="utils\color_cache.h" />
+    <ClInclude Include="utils\endian_inl.h" />
     <ClInclude Include="utils\filters.h" />
     <ClInclude Include="utils\huffman.h" />
     <ClInclude Include="utils\huffman_encode.h" />
@@ -245,6 +251,7 @@
     <ClInclude Include="webp\decode.h" />
     <ClInclude Include="webp\demux.h" />
     <ClInclude Include="webp\encode.h" />
+    <ClInclude Include="webp\extras.h" />
     <ClInclude Include="webp\format_constants.h" />
     <ClInclude Include="webp\mux.h" />
     <ClInclude Include="webp\mux_types.h" />
@@ -261,39 +268,72 @@
     <ClCompile Include="dec\vp8.cpp" />
     <ClCompile Include="dec\vp8l.cpp" />
     <ClCompile Include="dec\webp.cpp" />
+    <ClCompile Include="demux\anim_decode.cpp" />
     <ClCompile Include="demux\demux.cpp" />
     <ClCompile Include="dsp\alpha_processing.cpp" />
+    <ClCompile Include="dsp\alpha_processing_mips_dsp_r2.cpp" />
     <ClCompile Include="dsp\alpha_processing_sse2.cpp" />
+    <ClCompile Include="dsp\alpha_processing_sse41.cpp" />
+    <ClCompile Include="dsp\argb.cpp" />
+    <ClCompile Include="dsp\argb_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\argb_sse2.cpp" />
+    <ClCompile Include="dsp\cost.cpp" />
+    <ClCompile Include="dsp\cost_mips32.cpp" />
+    <ClCompile Include="dsp\cost_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\cost_sse2.cpp" />
     <ClCompile Include="dsp\cpu.cpp" />
     <ClCompile Include="dsp\dec.cpp" />
     <ClCompile Include="dsp\dec_clip_tables.cpp" />
     <ClCompile Include="dsp\dec_mips32.cpp" />
+    <ClCompile Include="dsp\dec_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\dec_msa.cpp" />
     <ClCompile Include="dsp\dec_neon.cpp" />
     <ClCompile Include="dsp\dec_sse2.cpp" />
+    <ClCompile Include="dsp\dec_sse41.cpp" />
     <ClCompile Include="dsp\enc.cpp" />
     <ClCompile Include="dsp\enc_avx2.cpp" />
     <ClCompile Include="dsp\enc_mips32.cpp" />
+    <ClCompile Include="dsp\enc_mips_dsp_r2.cpp" />
     <ClCompile Include="dsp\enc_neon.cpp" />
     <ClCompile Include="dsp\enc_sse2.cpp" />
+    <ClCompile Include="dsp\enc_sse41.cpp" />
+    <ClCompile Include="dsp\filters.cpp" />
+    <ClCompile Include="dsp\filters_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\filters_sse2.cpp" />
     <ClCompile Include="dsp\lossless.cpp" />
-    <ClCompile Include="dsp\lossless_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_enc.cpp" />
+    <ClCompile Include="dsp\lossless_enc_mips32.cpp" />
+    <ClCompile Include="dsp\lossless_enc_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\lossless_enc_neon.cpp" />
+    <ClCompile Include="dsp\lossless_enc_sse2.cpp" />
+    <ClCompile Include="dsp\lossless_enc_sse41.cpp" />
+    <ClCompile Include="dsp\lossless_mips_dsp_r2.cpp" />
     <ClCompile Include="dsp\lossless_neon.cpp" />
     <ClCompile Include="dsp\lossless_sse2.cpp" />
+    <ClCompile Include="dsp\rescaler.cpp" />
+    <ClCompile Include="dsp\rescaler_mips32.cpp" />
+    <ClCompile Include="dsp\rescaler_mips_dsp_r2.cpp" />
+    <ClCompile Include="dsp\rescaler_neon.cpp" />
+    <ClCompile Include="dsp\rescaler_sse2.cpp" />
     <ClCompile Include="dsp\upsampling.cpp" />
+    <ClCompile Include="dsp\upsampling_mips_dsp_r2.cpp" />
     <ClCompile Include="dsp\upsampling_neon.cpp" />
     <ClCompile Include="dsp\upsampling_sse2.cpp" />
     <ClCompile Include="dsp\yuv.cpp" />
     <ClCompile Include="dsp\yuv_mips32.cpp" />
+    <ClCompile Include="dsp\yuv_mips_dsp_r2.cpp" />
     <ClCompile Include="dsp\yuv_sse2.cpp" />
     <ClCompile Include="enc\alpha.cpp" />
     <ClCompile Include="enc\analysis.cpp" />
     <ClCompile Include="enc\backward_references.cpp" />
     <ClCompile Include="enc\config.cpp" />
     <ClCompile Include="enc\cost.cpp" />
+    <ClCompile Include="enc\delta_palettization.cpp" />
     <ClCompile Include="enc\filter.cpp" />
     <ClCompile Include="enc\frame.cpp" />
     <ClCompile Include="enc\histogram.cpp" />
     <ClCompile Include="enc\iterator.cpp" />
+    <ClCompile Include="enc\near_lossless.cpp" />
     <ClCompile Include="enc\picture.cpp" />
     <ClCompile Include="enc\picture_csp.cpp" />
     <ClCompile Include="enc\picture_psnr.cpp" />
@@ -305,6 +345,8 @@
     <ClCompile Include="enc\tree.cpp" />
     <ClCompile Include="enc\vp8l.cpp" />
     <ClCompile Include="enc\webpenc.cpp" />
+    <ClCompile Include="extras\extras.cpp" />
+    <ClCompile Include="mux\anim_encode.cpp" />
     <ClCompile Include="mux\muxedit.cpp" />
     <ClCompile Include="mux\muxinternal.cpp" />
     <ClCompile Include="mux\muxread.cpp" />
@@ -329,9 +371,6 @@
     <ClCompile Include="utils\thread.cpp" />
     <ClCompile Include="utils\utils.cpp" />
     <ClCompile Include="WebpCodec.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="dsp\Makefile.am" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

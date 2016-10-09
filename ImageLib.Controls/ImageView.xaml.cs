@@ -119,7 +119,7 @@ namespace ImageLib.Controls
             {
                 if (!string.IsNullOrEmpty(ImageLoaderKey))
                 {
-                    return ImageLoader.Collection[ImageLoaderKey];
+                    return ImageConfig.Collection[ImageLoaderKey];
                 }
                 return ImageLoader.Instance;
             }
@@ -143,15 +143,19 @@ namespace ImageLib.Controls
         private async Task UpdateSourceAsync()
         {
             _initializationCancellationTokenSource?.Cancel();
-            _image.Source = null;
+            _initializationCancellationTokenSource = null;
             this.PixelHeight = 0d;
             this.PixelWidth = 0d;
+            _image.Source = null;
+            _image.Tag = null;
+            _imagePackage?.Dispose();
             Interlocked.Exchange(ref _imagePackage, null);
             var uriSource = UriSource;
             if (uriSource == null)
             {
                 return;
             }
+            _image.Tag = uriSource;
             var cancellationTokenSource = new CancellationTokenSource();
             _initializationCancellationTokenSource = cancellationTokenSource;
             try
@@ -190,10 +194,7 @@ namespace ImageLib.Controls
                 image.Source = new BitmapImage(uriSource);
                 return null;
             }
-
-            image.Source = null;
             var package = await this.CurrentLoader.LoadImage(image, uriSource, cancellationTokenSource);
-            Interlocked.Exchange(ref _imagePackage, null);
             if (package == null)
             {
                 throw new Exception("package is null");
@@ -278,7 +279,7 @@ namespace ImageLib.Controls
         private void OnSurfaceContentsLost(object sender, object e)
         {
             var source = _imagePackage?.Decoder?.RecreateSurfaces();
-            _imagePackage.UpdateSource(source);
+            _imagePackage?.UpdateSource(source);
             if (source != null)
             {
                 _image.Source = source;

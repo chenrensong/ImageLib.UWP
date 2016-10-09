@@ -18,7 +18,6 @@ namespace ImageLib.IO
 {
     public interface IImageDecoder : IDisposable
     {
-        int Priority { get; }
 
         /// <summary>
         /// Gets the size of the header for this image type.
@@ -27,17 +26,11 @@ namespace ImageLib.IO
         int HeaderSize { get; }
 
         /// <summary>
-        /// Indicates if the image decoder supports the specified
-        /// file header.
+        /// 越高优先级越高 -1 为不支持
         /// </summary>
-        /// <param name="header">The file header.</param>
-        /// <returns>
-        /// <c>true</c>, if the decoder supports the specified
-        /// file header; otherwise <c>false</c>.
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException"><paramref name="header"/>
-        /// is null (Nothing in Visual Basic).</exception>
-        bool IsSupportedFileFormat(byte[] header);
+        /// <param name="header"></param>
+        /// <returns></returns>
+        int GetPriority(byte[] header);
 
         /// <summary>
         /// 执行播放(动态图片)
@@ -61,7 +54,7 @@ namespace ImageLib.IO
         /// <param name="dispatcher">用于UI线程绘制</param>
         /// <param name="streamSource">stream</param>
         /// <returns></returns>
-        Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image,
+        Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource);
 
     }

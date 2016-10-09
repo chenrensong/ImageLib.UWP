@@ -53,3 +53,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 *.opendb
+/ImageLib.VC.db
+/.vs
+/ImageLib.VC.db

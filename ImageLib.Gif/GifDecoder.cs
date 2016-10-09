@@ -6,6 +6,7 @@
 // All rights reserved.
 // ===============================================================================
 
+using ImageLib.Cache.Memory;
 using ImageLib.IO;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Xaml;
@@ -40,23 +41,17 @@ namespace ImageLib.Gif
             }
         }
 
-        public int Priority
-        {
-            get
-            {
-                return 0;
-            }
-        }
 
-        public bool IsSupportedFileFormat(byte[] header)
+        public int GetPriority(byte[] header)
         {
-            return header != null && header.Length >= 6 &&
+            var isSupported = header != null && header.Length >= 6 &&
                    header[0] == 0x47 && // G
                    header[1] == 0x49 && // I
                    header[2] == 0x46 && // F
                    header[3] == 0x38 && // 8
                    (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
                    header[5] == 0x61;   // a
+            return isSupported ? 0 : -1;
         }
 
         #region Private struct declarations
@@ -76,9 +71,8 @@ namespace ImageLib.Gif
             }
         }
 
-        internal class FrameProperties
+        internal struct FrameProperties
         {
-            private WeakReference<BitmapFrame> _bitmapFrame = null;
             public readonly Rect Rect;
             public readonly double DelayMilliseconds;
             public readonly bool ShouldDispose;
@@ -91,70 +85,31 @@ namespace ImageLib.Gif
                 DelayMilliseconds = delayMilliseconds;
                 ShouldDispose = shouldDispose;
             }
+        }
 
-            public async Task<byte[]> DecodeAsync(BitmapDecoder bitmapDecoder)
+
+        public async Task<byte[]> DecodePixelAsync(uint frameIndex)
+        {
+            BitmapFrame bitmapFrame = null;
+            if (!_bitmapFrameCache.TryGetValue(frameIndex, out bitmapFrame))
             {
-                BitmapFrame bitmapFrame = null;
-                if (_bitmapFrame == null || !_bitmapFrame.TryGetTarget(out bitmapFrame))
-                {
-                    bitmapFrame = await bitmapDecoder.GetFrameAsync(FrameIndex).AsTask().ConfigureAwait(false);
-                    _bitmapFrame = new WeakReference<BitmapFrame>(bitmapFrame);
-                }
-                var pixelData = await bitmapFrame.GetPixelDataAsync(
-                   BitmapPixelFormat.Bgra8,
-                   BitmapAlphaMode.Premultiplied,
-                   new BitmapTransform(),
-                   ExifOrientationMode.IgnoreExifOrientation,
-                   ColorManagementMode.DoNotColorManage
-                   ).AsTask().ConfigureAwait(false);
-                return pixelData.DetachPixelData();
+                bitmapFrame = await _bitmapDecoder.GetFrameAsync(frameIndex);
+                _bitmapFrameCache.Add(frameIndex, bitmapFrame);
             }
-
-            public void Release()
-            {
-                _bitmapFrame = null;
-            }
-
+            var pixelData = await bitmapFrame.GetPixelDataAsync(
+               BitmapPixelFormat.Bgra8,
+               BitmapAlphaMode.Premultiplied,
+               new BitmapTransform(),
+               ExifOrientationMode.IgnoreExifOrientation,
+               ColorManagementMode.DoNotColorManage
+               ).AsTask().ConfigureAwait(false);
+            return pixelData.DetachPixelData();
         }
 
         #endregion
 
 
-        private class LazyFrameCollection : SortedList<int, FrameProperties>
-        {
-            private SortedList<int, Func<Task<FrameProperties>>> _funcCollection =
-                new SortedList<int, Func<Task<FrameProperties>>>();
-
-            public void Add(int index, Func<Task<FrameProperties>> func)
-            {
-                _funcCollection.Add(index, func);
-            }
-
-            public async Task<FrameProperties> Get(int index)
-            {
-                if (!this.ContainsKey(index))
-                {
-                    var func = _funcCollection[index];
-                    var frameProperties = await func.Invoke();
-                    _funcCollection.Remove(index);//clear invoked func
-                    this.Add(index, frameProperties);
-                }
-                return base[index];
-            }
-
-            /// <summary>
-            /// 释放资源
-            /// </summary>
-            public void Release()
-            {
-                foreach (var item in this)
-                {
-                    item.Value.Release();
-                }
-            }
-        }
-
-
+        private WeakRefDictionary<uint, BitmapFrame> _bitmapFrameCache = new WeakRefDictionary<uint, BitmapFrame>();
         private DispatcherTimer _animationTimer;
 
         private int _currentFrameIndex;
@@ -163,7 +118,7 @@ namespace ImageLib.Gif
 
         private BitmapDecoder _bitmapDecoder;
         private ImageProperties _imageProperties;
-        private LazyFrameCollection _frameProperties;
+        private List<FrameProperties> _frameProperties;
 
         private CanvasImageSource _canvasImageSource;
         private CanvasRenderTarget _accumulationRenderTarget;
@@ -175,30 +130,29 @@ namespace ImageLib.Gif
 
 
 
-        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image,
+        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
         {
-            var inMemoryStream = new InMemoryRandomAccessStream();
-            var copyAction = RandomAccessStream.CopyAndCloseAsync(
-                           streamSource.GetInputStreamAt(0L),
-                           inMemoryStream.GetOutputStreamAt(0L));
-            await copyAction.AsTask(cancellationTokenSource.Token);
+            //var inMemoryStream = new InMemoryRandomAccessStream();
+            //var copyAction = RandomAccessStream.CopyAndCloseAsync(
+            //               streamSource.GetInputStreamAt(0L),
+            //               inMemoryStream.GetOutputStreamAt(0L));
+            //await copyAction.AsTask(cancellationTokenSource.Token);
 
-            var bitmapDecoder = await BitmapDecoder.
-                CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream).AsTask(cancellationTokenSource.Token).ConfigureAwait(false);
+            var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
+            if (bitmapDecoder == null)
+            {
+                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, streamSource);
+                ImagingCache.Add(uriSource, bitmapDecoder);
+            }
 
             var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
-            var frameProperties = new LazyFrameCollection();
+            var frameProperties = new List<FrameProperties>();
 
             for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
             {
                 var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask(cancellationTokenSource.Token).ConfigureAwait(false); ;
-                uint temp = i;
-                //frameProperties.Add((int)temp, async () =>
-                //{
-                //    return await RetrieveFramePropertiesAsync(temp, bitmapFrame);
-                //});
-                frameProperties.Add((int)temp, await RetrieveFramePropertiesAsync(i, bitmapFrame));
+                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
             }
 
             _frameProperties = frameProperties;
@@ -209,7 +163,11 @@ namespace ImageLib.Gif
             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {
                  CreateCanvasResources();
-                 image.Source = _canvasImageSource;
+                 var uri = image.Tag as Uri;
+                 if (uri == uriSource)
+                 {
+                     image.Source = _canvasImageSource;
+                 }
              });
 
             _isInitialized = true;
@@ -267,7 +225,7 @@ namespace ImageLib.Gif
             }
 
             var frameIndex = _currentFrameIndex;
-            var frameProperties = await _frameProperties.Get(frameIndex);
+            var frameProperties = _frameProperties[frameIndex];
             var disposeRequested = _disposeRequested;
 
             // Increment frame index and loop count
@@ -293,14 +251,13 @@ namespace ImageLib.Gif
             }
 
             // Decode the frame
-            //var pixels = await this.DecodePixelAsync((uint)frameIndex);
-            var pixels = await frameProperties.DecodeAsync(_bitmapDecoder);
+            var pixels = await this.DecodePixelAsync((uint)frameIndex);
             var frameRectangle = frameProperties.Rect;
             var disposeRectangle = Rect.Empty;
 
             if (frameIndex > 0)
             {
-                var previousFrameProperties = await _frameProperties.Get(frameIndex - 1);
+                var previousFrameProperties = _frameProperties[frameIndex - 1];
                 if (previousFrameProperties.ShouldDispose)
                 {
                     // Clear the pixels from the last frame
@@ -587,12 +544,8 @@ namespace ImageLib.Gif
                 _isInitialized = false;
                 _hasCanvasResources = false;
                 _bitmapDecoder = null;
-                if (_frameProperties != null)
-                {
-                    _frameProperties.Release();
-                    _frameProperties.Clear();
-                    _frameProperties = null;
-                }
+                _frameProperties?.Clear();
+                _frameProperties = null;
                 _canvasImageSource = null;
                 _accumulationRenderTarget = null;
                 _animationTimer = null;

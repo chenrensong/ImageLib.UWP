@@ -31,7 +31,6 @@ typedef struct WebPData WebPData;
 
 // VP8X Feature Flags.
 typedef enum WebPFeatureFlags {
-  NO_FLAG         = 0x00000000,
   FRAGMENTS_FLAG  = 0x00000001,
   ANIMATION_FLAG  = 0x00000002,
   XMP_FLAG        = 0x00000004,

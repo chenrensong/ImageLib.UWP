@@ -18,6 +18,12 @@ namespace ImageLib
             ImageSource = source;
         }
 
+        public void Dispose()
+        {
+            Decoder?.Dispose();
+            ImageSource = null;
+        }
+
         public IImageDecoder Decoder { get; private set; }
 
         public ImageSource ImageSource { get; private set; }
