@@ -92,7 +92,6 @@ namespace ImageLib
             {
                 throw new ArgumentException("Can not initialize ImageLoader with empty configuration");
             }
-            ImageConfig.Default = imageConfig;
         }
 
         internal ReadOnlyCollection<IImageDecoder> GetAvailableDecoders()
@@ -161,6 +160,7 @@ namespace ImageLib
             CheckConfig();
             ImagePackage imagePackage = null;
             var decoders = this.GetAvailableDecoders();
+      
             var randStream = await this.LoadImageStream(uriSource, cancellationTokenSource);
             if (randStream == null)
             {

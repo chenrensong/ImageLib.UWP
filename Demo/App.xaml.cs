@@ -41,7 +41,7 @@ namespace Demo
                 MemoryCacheImpl = new LRUMemoryCache(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), true);
+            }.NewApi(false).AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), true);
 
             ImageLoader.Register("test", new ImageConfig.Builder()
             {

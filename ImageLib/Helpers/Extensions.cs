@@ -34,13 +34,15 @@ namespace ImageLib.Helpers
 
         public static async Task<IRandomAccessStream> GetStreamFromUri(this Uri uri, CancellationToken cancellationToken)
         {
+
             switch (uri.Scheme)
             {
                 case "ms-appx":
                 case "ms-appdata":
                     {
                         var file = await StorageFile.GetFileFromApplicationUriAsync(uri);
-                        return await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
+                        var result = await file.OpenAsync(FileAccessMode.Read).AsTask(cancellationToken).ConfigureAwait(false);
+                        return result;
                     }
                 case "ms-resource":
                     {

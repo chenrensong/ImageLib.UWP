@@ -67,7 +67,7 @@ namespace ImageLib.Webp
             var isSupported = header != null && header.Length >= 12
                 && header[0] == 'R' && header[1] == 'I' && header[2] == 'F' && header[3] == 'F'
                 && header[8] == 'W' && header[9] == 'E' && header[10] == 'B' && header[11] == 'P';
-            return isSupported ? 0 : -1;
+            return isSupported ? 1 : -1;
         }
 
         public ImageSource RecreateSurfaces()

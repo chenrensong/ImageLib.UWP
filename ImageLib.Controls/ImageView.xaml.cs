@@ -22,6 +22,7 @@ namespace ImageLib.Controls
     public sealed partial class ImageView : UserControl
     {
 
+
         #region Public Events
         /// <summary>
         /// 开始加载
@@ -194,7 +195,10 @@ namespace ImageLib.Controls
                 image.Source = new BitmapImage(uriSource);
                 return null;
             }
-            var package = await this.CurrentLoader.LoadImage(image, uriSource, cancellationTokenSource);
+            ImagePackage package = null;
+
+            package = await this.CurrentLoader.LoadImage(image, uriSource, cancellationTokenSource);
+
             if (package == null)
             {
                 throw new Exception("package is null");
@@ -209,6 +213,7 @@ namespace ImageLib.Controls
              });
             this.PixelWidth = package.PixelWidth;
             this.PixelHeight = package.PixelHeight;
+
             return package.ImageSource;
         }
 
@@ -295,6 +300,8 @@ namespace ImageLib.Controls
         {
             _imagePackage?.Decoder?.Start();
         }
+
+
 
         #endregion
 

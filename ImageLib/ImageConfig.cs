@@ -11,6 +11,7 @@ namespace ImageLib
 {
     public class ImageConfig
     {
+
         /// <summary>
         /// 默认Config
         /// </summary>
@@ -22,8 +23,8 @@ namespace ImageLib
         public readonly StorageCacheBase StorageCacheImpl;
         public readonly IUriParser UriParser;
         public readonly List<Type> DecoderTypes;
-        public readonly bool NewApiSupported = true;
-
+        public readonly bool NewApiSupported;
+ 
         private ImageConfig(Builder builder)
         {
             if (builder.MemoryCacheImpl == null && builder.StorageCacheImpl == null)
@@ -99,9 +100,10 @@ namespace ImageLib
                 return this;
             }
 
-            public void NewApi(bool isSupported)
+            public Builder NewApi(bool isSupported)
             {
                 NewApiSupported = isSupported;
+                return this;
             }
 
             public ImageConfig Build()

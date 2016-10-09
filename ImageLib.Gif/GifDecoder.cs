@@ -51,7 +51,7 @@ namespace ImageLib.Gif
                    header[3] == 0x38 && // 8
                    (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
                    header[5] == 0x61;   // a
-            return isSupported ? 0 : -1;
+            return isSupported ? 1 : -1;
         }
 
         #region Private struct declarations
@@ -133,16 +133,16 @@ namespace ImageLib.Gif
         public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource,
             IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
         {
-            //var inMemoryStream = new InMemoryRandomAccessStream();
-            //var copyAction = RandomAccessStream.CopyAndCloseAsync(
-            //               streamSource.GetInputStreamAt(0L),
-            //               inMemoryStream.GetOutputStreamAt(0L));
-            //await copyAction.AsTask(cancellationTokenSource.Token);
-
+   
             var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
             if (bitmapDecoder == null)
             {
-                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, streamSource);
+                var inMemoryStream = new InMemoryRandomAccessStream();
+                var copyAction = RandomAccessStream.CopyAndCloseAsync(
+                               streamSource.GetInputStreamAt(0L),
+                               inMemoryStream.GetOutputStreamAt(0L));
+                await copyAction.AsTask(cancellationTokenSource.Token);
+                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream);
                 ImagingCache.Add(uriSource, bitmapDecoder);
             }
 

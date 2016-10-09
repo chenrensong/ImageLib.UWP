@@ -134,7 +134,7 @@ namespace ImageLib.Cache.Memory
         private static Dictionary<Uri, object> _cache = new Dictionary<Uri, object>();
 
         /// max size to limit the cache
-        private static int MAX_CACHE_SIZE = 50;
+        private static int MAX_CACHE_SIZE = 10;
 
         #endregion
     }

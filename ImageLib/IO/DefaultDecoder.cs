@@ -14,7 +14,6 @@ namespace ImageLib.IO
     {
         private static bool NewApiSupported = ApiInformation.IsPropertyPresent("Windows.UI.Xaml.Media.Imaging.BitmapImage", nameof(BitmapImage.IsAnimatedBitmap));
         private BitmapImage _bitmapImage;
-        private bool _isGifFormat = false;
 
         public int HeaderSize
         {
@@ -42,14 +41,14 @@ namespace ImageLib.IO
 
         public int GetPriority(byte[] header)
         {
-            _isGifFormat = header != null && header.Length >= 6 &&
-                    header[0] == 0x47 && // G
-                    header[1] == 0x49 && // I
-                    header[2] == 0x46 && // F
-                    header[3] == 0x38 && // 8
-                    (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
-                    header[5] == 0x61;   // a
-            if (_isGifFormat && NewApiSupported && ImageConfig.Default.NewApiSupported)
+            var isGifFormat = header != null && header.Length >= 6 &&
+                        header[0] == 0x47 && // G
+                        header[1] == 0x49 && // I
+                        header[2] == 0x46 && // F
+                        header[3] == 0x38 && // 8
+                        (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
+                        header[5] == 0x61;   // a
+            if (isGifFormat && NewApiSupported && ImageConfig.Default.NewApiSupported)
             {
                 return int.MaxValue;//高优先级
             }
@@ -64,6 +63,17 @@ namespace ImageLib.IO
 
         public void Dispose()
         {
+            if (NewApiSupported)
+            {
+                if (_bitmapImage != null)
+                {
+                    if (_bitmapImage.IsAnimatedBitmap && _bitmapImage.IsPlaying)
+                    {
+                        _bitmapImage.Stop();
+                    }
+                }
+            }
+            _bitmapImage = null;
         }
 
         public void Start()

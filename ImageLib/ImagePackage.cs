@@ -21,6 +21,7 @@ namespace ImageLib
         public void Dispose()
         {
             Decoder?.Dispose();
+            Decoder = null;
             ImageSource = null;
         }
 
