@@ -7,15 +7,15 @@
   支持Universal Windows Platform(UWP)，基于微软最新的2d图形加速引擎**Win2d**，支持gif、jpg、png、webp等格式。
   同时支持实现[IImageDecoder](https://github.com/chenrensong/ImageLib.UWP/blob/master/ImageLib/IO/IImageDecoder.cs)接口来支持更多图片格式。
  
+GifDecoder会自适应在14393版本上使用framework自带的Gif解码，在低版本上使用win2d解码，由于framework自带的解码会出现帧率问题，如果介意可以直接使用CustomGifDecoder使用默认解码。
+
 ## 初始化
 ``` c#
-  ImageLoader.Initialize(new ImageConfig.Builder()
+    ImageLoader.Initialize(new ImageConfig.Builder()
             {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
                 "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), false);
+            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), true);
 ```
 ## XAML代码
 ``` xaml
@@ -26,10 +26,8 @@
 ```
 ## 自定义ImageLoader
 ``` c#
-  ImageLoader.Register("test", new ImageConfig.Builder()
+      ImageLoader.Register("test", new ImageConfig.Builder()
             {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
                 StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
                 "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
             }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
