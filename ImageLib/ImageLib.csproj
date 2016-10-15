@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\Memory\ImagingCache.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="IO\DefaultDecoder.cs" />
     <Compile Include="ImagePackage.cs" />
     <Compile Include="Http\AsyncHttpClient.cs" />

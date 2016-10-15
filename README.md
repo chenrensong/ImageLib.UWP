@@ -9,13 +9,13 @@
  
 ## 初始化
 ``` c#
-  ImageLoader.Initialize(new ImageConfig.Builder()
-            {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
-                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-                "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), false);
+      var config = new ImageConfig.Builder()
+                .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+                .NewApi(false)
+                .AddDecoder<GifDecoder>()
+                .AddDecoder<WebpDecoder>()
+                .Build();
+            ImageLoader.Initialize(config);
 ```
 ## XAML代码
 ``` xaml
@@ -26,13 +26,13 @@
 ```
 ## 自定义ImageLoader
 ``` c#
-  ImageLoader.Register("test", new ImageConfig.Builder()
-            {
-                CacheMode = ImageLib.Cache.CacheMode.MemoryAndStorageCache,
-                MemoryCacheImpl = new LRUCache<string, IRandomAccessStream>(),
-                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
-                "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
+	 var config = new ImageConfig.Builder()
+                .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+                .NewApi(false)
+                .AddDecoder<GifDecoder>()
+                .AddDecoder<WebpDecoder>()
+                .Build();
+    ImageLoader.Register("test", config);
 ```
 ``` xaml
  <controls:ImageView 

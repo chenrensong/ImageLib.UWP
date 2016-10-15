@@ -7,8 +7,8 @@ namespace ImageLib.Cache
     public enum CacheMode
     {
         NoCache,
-        OnlyMemoryCache,
         OnlyStorageCache,
-        MemoryAndStorageCache,
+        //OnlyMemoryCache,
+        //MemoryAndStorageCache,
     }
 }

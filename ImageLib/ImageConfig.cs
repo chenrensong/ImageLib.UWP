@@ -6,6 +6,8 @@ using Windows.Storage.Streams;
 using System.Collections.Generic;
 using ImageLib.IO;
 using ImageLib.Parser;
+using Windows.Storage;
+using ImageLib.Cache.Storage.CacheImpl;
 
 namespace ImageLib
 {
@@ -19,31 +21,26 @@ namespace ImageLib
         internal static readonly Dictionary<string, ImageLoader> Collection = new Dictionary<string, ImageLoader>();
 
         public readonly CacheMode CacheMode;
-        public readonly MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl;
         public readonly StorageCacheBase StorageCacheImpl;
         public readonly IUriParser UriParser;
         public readonly List<Type> DecoderTypes;
         public readonly bool NewApiSupported;
- 
+        /// <summary>
+        /// Enable/Disable log output for ImageLoader
+        /// Default - false
+        /// </summary>
+        public readonly bool IsLogEnabled;
+
         private ImageConfig(Builder builder)
         {
-            if (builder.MemoryCacheImpl == null && builder.StorageCacheImpl == null)
+            if (builder.StorageCacheImpl == null)
             {
                 CacheMode = CacheMode.NoCache;
             }
-            else if (builder.MemoryCacheImpl == null && builder.StorageCacheImpl != null)
+            else
             {
                 CacheMode = CacheMode.OnlyStorageCache;
             }
-            else if (builder.MemoryCacheImpl != null && builder.StorageCacheImpl == null)
-            {
-                CacheMode = CacheMode.OnlyMemoryCache;
-            }
-            else
-            {
-                CacheMode = CacheMode.MemoryAndStorageCache;
-            }
-            MemoryCacheImpl = builder.MemoryCacheImpl;
             StorageCacheImpl = builder.StorageCacheImpl;
             DecoderTypes = builder.DecoderTypes;
             UriParser = builder.UriParser;
@@ -57,34 +54,25 @@ namespace ImageLib
         public class Builder
         {
             /// <summary>
-            /// Decoder Types
-            /// </summary>
-            private readonly List<Type> _decoderTypes = new List<Type>();
-
-            /// <summary>
             /// Gets/Sets memory cache implementation for ImageLoader
             /// If you will leave it empty but CacheMode will require it, will be used WeakMemoryCache implementation 
             /// </summary>
-            public MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl { get; set; }
+            //public MemoryCacheBase<string, IRandomAccessStream> MemoryCacheImpl { get; set; }
 
             /// <summary>
             /// Gets/Sets storage cache implementation for ImageLoader
             /// If you will leave it empty but CacheMode will require it, exception will be thrown
             /// Default - null, I am sorry for that, but it requires StorageFolder instance, so you have to init it anyway
             /// </summary>
-            public StorageCacheBase StorageCacheImpl { get; set; }
+            internal StorageCacheBase StorageCacheImpl { get; private set; }
 
-            public IUriParser UriParser { get; set; }
+            internal IUriParser UriParser { get; private set; }
 
             internal bool NewApiSupported { get; private set; } = true;
 
-            public List<Type> DecoderTypes
-            {
-                get
-                {
-                    return _decoderTypes;
-                }
-            }
+            internal bool IsLogEnabled { get; private set; } = false;
+
+            internal List<Type> DecoderTypes { get; private set; } = new List<Type>();
 
             public Builder AddDecoder<TDecoder>() where TDecoder : IImageDecoder
             {
@@ -93,9 +81,9 @@ namespace ImageLib
                     new ArgumentException("DefaultDecoder is default decoder");
                 }
 
-                if (!_decoderTypes.Contains(typeof(TDecoder)))
+                if (!DecoderTypes.Contains(typeof(TDecoder)))
                 {
-                    _decoderTypes.Add(typeof(TDecoder));
+                    DecoderTypes.Add(typeof(TDecoder));
                 }
                 return this;
             }
@@ -105,6 +93,29 @@ namespace ImageLib
                 NewApiSupported = isSupported;
                 return this;
             }
+
+            /// <summary>
+            /// 是否支持最新的Gif Api
+            /// </summary>
+            /// <param name="isSupported"></param>
+            /// <returns></returns>
+            public Builder LimitedStorageCache(StorageFolder isf, string cacheDirectory, ICacheGenerator cacheFileNameGenerator, long cacheLimitInBytes)
+            {
+                StorageCacheImpl = new LimitedStorageCache(isf, cacheDirectory, cacheFileNameGenerator, cacheLimitInBytes);
+                return this;
+            }
+
+            /// <summary>
+            /// 是否开启日志
+            /// </summary>
+            /// <param name="isLogEnabled"></param>
+            /// <returns></returns>
+            public Builder LogEnabled(bool isLogEnabled)
+            {
+                IsLogEnabled = isLogEnabled;
+                return this;
+            }
+
 
             public ImageConfig Build()
             {

@@ -18,10 +18,12 @@ namespace ImageLib.Http
         public HttpStatusCode StatusCode { get; private set; }
         public Encoding Encoding { get; private set; }
         public Exception Exception { get; private set; }
+        public Uri Location { get; set; }
 
         internal AsyncHttpResponse(HttpResponseMessage rsp, string encoding)
         {
             this.StatusCode = rsp.StatusCode;
+            this.Location = rsp.Headers.Location;
             this.Encoding = Encoding.GetEncoding(encoding ?? "UTF-8");
             this.Headers = new Dictionary<string, string>();
             this.Cookies = null;
@@ -35,6 +37,7 @@ namespace ImageLib.Http
             this.Encoding = Encoding.GetEncoding(encoding ?? "UTF-8");
             this.Headers = new Dictionary<string, string>();
             this.Cookies = null;
+            this.Location = null;
             this.Exception = exp;
         }
 
@@ -74,7 +77,7 @@ namespace ImageLib.Http
                 await datawriter.StoreAsync();
                 return inStream;
             }
-          
+
         }
 
         public IBuffer GetBuffer()

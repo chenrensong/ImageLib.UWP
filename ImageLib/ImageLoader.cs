@@ -20,11 +20,6 @@ namespace ImageLib
 {
     public class ImageLoader
     {
-        /// <summary>
-        /// Enable/Disable log output for ImageLoader
-        /// Default - false
-        /// </summary>
-        internal static bool IsLogEnabled { get; set; }
         private static readonly object LockObject = new object();
         /// <summary>
         /// 默认的ImageLoader实例
@@ -37,7 +32,7 @@ namespace ImageLib
         private TaskScheduler _sequentialScheduler;
 
 
-        public static ImageLoader Initialize(ImageConfig imageConfig, bool isLogEnabled = false)
+        public static ImageLoader Initialize(ImageConfig imageConfig)
         {
             if (imageConfig == null)
             {
@@ -47,7 +42,6 @@ namespace ImageLib
             {
                 return ImageLoader.Instance;
             }
-            IsLogEnabled = isLogEnabled;
             ImageConfig.Default = imageConfig;
             return ImageLoader.Instance;
         }
@@ -120,15 +114,6 @@ namespace ImageLib
             }
         }
 
-        public virtual void ClearMemoryCache()
-        {
-            CheckConfig();
-            if (ImageConfig.Default.MemoryCacheImpl != null)
-            {
-                ImageConfig.Default.MemoryCacheImpl.Clear();
-            }
-        }
-
 
         protected virtual void CheckConfig()
         {
@@ -160,7 +145,7 @@ namespace ImageLib
             CheckConfig();
             ImagePackage imagePackage = null;
             var decoders = this.GetAvailableDecoders();
-      
+
             var randStream = await this.LoadImageStream(uriSource, cancellationTokenSource);
             if (randStream == null)
             {
@@ -262,17 +247,7 @@ namespace ImageLib
                 ImageLog.Log("[network] loaded " + imageUrl);
                 if (ImageConfig.Default.CacheMode != CacheMode.NoCache)
                 {
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                         ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
-                    {
-                        if (randStream != null)
-                        {
-                            ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, randStream);
-                        }
-                    }
-
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                     ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
+                    if (ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
                     {
                         //是http or https 才加入本地缓存
                         if (imageUri.IsWebScheme())
@@ -324,41 +299,19 @@ namespace ImageLib
 
         private async Task<IRandomAccessStream> LoadImageStreamFromCacheInternal(Uri imageUri)
         {
-
             var imageUrl = imageUri.AbsoluteUri;
-
-            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                ImageConfig.Default.CacheMode == CacheMode.OnlyMemoryCache)
-            {
-                IRandomAccessStream memoryStream;
-                //尝试获取内存缓存
-                if (ImageConfig.Default.MemoryCacheImpl.TryGetValue(imageUrl, out memoryStream))
-                {
-                    ImageLog.Log("[memory] " + imageUrl);
-                    return memoryStream;
-                }
-            }
-
             //获取不到内存缓存
-            if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache ||
-                   ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
+            if (ImageConfig.Default.CacheMode == CacheMode.OnlyStorageCache)
             {
                 //网络uri且缓存可用
                 if (imageUri.IsWebScheme() && await ImageConfig.Default.StorageCacheImpl.IsCacheExistsAndAlive(imageUrl))
                 {
                     ImageLog.Log("[storage] " + imageUrl);
                     var storageStream = await ImageConfig.Default.StorageCacheImpl.LoadCacheStreamAsync(imageUrl);
-                    // Moving cache to the memory
-                    if (ImageConfig.Default.CacheMode == CacheMode.MemoryAndStorageCache
-                          && storageStream != null)
-                    {
-                        ImageConfig.Default.MemoryCacheImpl.Put(imageUrl, storageStream);
-                    }
                     return storageStream;
                 }
             }
             return null;
-
         }
 
 

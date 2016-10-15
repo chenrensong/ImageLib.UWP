@@ -36,19 +36,14 @@ namespace Demo
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.UnhandledException += App_UnhandledException;
-            ImageLoader.Initialize(new ImageConfig.Builder()
-            {
-                MemoryCacheImpl = new LRUMemoryCache(),
-                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalCacheFolder,
-                "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.NewApi(false).AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build(), true);
 
-            ImageLoader.Register("test", new ImageConfig.Builder()
-            {
-                MemoryCacheImpl = new LRUMemoryCache(),
-                StorageCacheImpl = new LimitedStorageCache(ApplicationData.Current.LocalFolder,
-                "cache1", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
-            }.AddDecoder<GifDecoder>().AddDecoder<WebpDecoder>().Build());
+            var config = new ImageConfig.Builder()
+                .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
+                .NewApi(false)
+                .AddDecoder<GifDecoder>()
+                .AddDecoder<WebpDecoder>()
+                .Build();
+            ImageLoader.Initialize(config);
 
         }
 
