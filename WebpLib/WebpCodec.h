@@ -6,7 +6,6 @@ using namespace Platform;
 using namespace Windows::UI::Xaml::Media::Imaging;
 using namespace Windows::Foundation::Metadata;
 
-
 namespace WebpLib
 {
 	[WebHostHidden]

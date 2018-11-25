@@ -7,8 +7,8 @@
 // ===============================================================================
 #include "pch.h"
 #include "WebpCodec.h"
-#include "../webp/decode.h"
-#include "../webp/demux.h"
+#include "./webp/decode.h"
+#include "./webp/demux.h"
 #include <wrl/implements.h>
 #include <wrl\client.h>
 #include <windows.storage.streams.h>
