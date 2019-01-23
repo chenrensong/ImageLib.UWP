@@ -1,14 +1,11 @@
 ﻿using ImageLib;
-using ImageLib.Cache.Memory.CacheImpl;
 using ImageLib.Cache.Storage;
-using ImageLib.Cache.Storage.CacheImpl;
 using ImageLib.Gif;
-using ImageLib.Webp;
+using ImageLib.WebP;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -41,7 +38,7 @@ namespace Demo
                 .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
                 .NewApi(false)
                 .AddDecoder<GifDecoder>()
-                .AddDecoder<WebpDecoder>()
+                .AddDecoder<WebPDecoder>()
                 .Build();
             ImageLoader.Initialize(config);
 

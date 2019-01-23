@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -118,12 +118,6 @@
     <Content Include="Properties\ImageLib.Controls.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImageLib\ImageLib.csproj">
-      <Project>{13258fbc-ed4a-476c-a0f3-bccf82177476}</Project>
-      <Name>ImageLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.2</Version>
     </PackageReference>
@@ -133,6 +127,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ImageLib.Core\ImageLib.Core.csproj">
+      <Project>{d49b7ed9-bc82-4f4e-8a51-02feabdc426b}</Project>
+      <Name>ImageLib.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageLib.Support\ImageLib.Support.csproj">
+      <Project>{7d371f35-508b-448d-9519-44be756284c0}</Project>
+      <Name>ImageLib.Support</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

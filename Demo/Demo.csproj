@@ -11,8 +11,8 @@
     <AssemblyName>Demo</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
@@ -151,21 +151,21 @@
       <Project>{f1a4bb2f-dcd6-46d7-bd10-0d29ac41a810}</Project>
       <Name>ImageLib.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ImageLib.Core\ImageLib.Core.csproj">
+      <Project>{d49b7ed9-bc82-4f4e-8a51-02feabdc426b}</Project>
+      <Name>ImageLib.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ImageLib.Gif\ImageLib.Gif.csproj">
       <Project>{248a9a1c-18a7-4101-9ebf-cfe1fc23a1b0}</Project>
       <Name>ImageLib.Gif</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageLib.Webp\ImageLib.Webp.csproj">
-      <Project>{27dfb1c8-3bb4-4440-a94b-6499440e4327}</Project>
-      <Name>ImageLib.Webp</Name>
+    <ProjectReference Include="..\ImageLib.Support\ImageLib.Support.csproj">
+      <Project>{7d371f35-508b-448d-9519-44be756284c0}</Project>
+      <Name>ImageLib.Support</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageLib\ImageLib.csproj">
-      <Project>{13258fbc-ed4a-476c-a0f3-bccf82177476}</Project>
-      <Name>ImageLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebpLib\WebpLib.vcxproj">
-      <Project>{45131605-318b-4f6d-bb6e-7b36f2f94d65}</Project>
-      <Name>WebpLib</Name>
+    <ProjectReference Include="..\ImageLib.Webp\ImageLib.Webp.vcxproj">
+      <Project>{9e7b142f-39eb-40dd-8fb7-28cb1a396661}</Project>
+      <Name>ImageLib.WebP</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

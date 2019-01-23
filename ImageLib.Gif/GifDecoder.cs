@@ -7,11 +7,12 @@
 // ===============================================================================
 
 using ImageLib.Cache.Memory;
-using ImageLib.IO;
+using ImageLib.Support;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ using Windows.UI.Xaml.Media;
 
 namespace ImageLib.Gif
 {
-    public sealed class GifDecoder : IImageDecoder
+    public sealed class GifDecoder : IImageDecoder, IDisposable
     {
         /// <summary>
         /// Gif头为6
@@ -42,16 +43,10 @@ namespace ImageLib.Gif
         }
 
 
-        public int GetPriority(byte[] header)
+        public int GetPriority(IBuffer headerBuffer)
         {
-            var isSupported = header != null && header.Length >= 6 &&
-                   header[0] == 0x47 && // G
-                   header[1] == 0x49 && // I
-                   header[2] == 0x46 && // F
-                   header[3] == 0x38 && // 8
-                   (header[4] == 0x39 || header[4] == 0x37) && // 9 or 7
-                   header[5] == 0x61;   // a
-            return isSupported ? 1 : -1;
+            var isGifFormat = ImageFormat.IsGif(headerBuffer);
+            return isGifFormat ? 1 : -1;
         }
 
         #region Private struct declarations
@@ -130,49 +125,6 @@ namespace ImageLib.Gif
 
 
 
-        public async Task<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource,
-            IRandomAccessStream streamSource, CancellationTokenSource cancellationTokenSource)
-        {
-   
-            var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
-            if (bitmapDecoder == null)
-            {
-                var inMemoryStream = new InMemoryRandomAccessStream();
-                var copyAction = RandomAccessStream.CopyAndCloseAsync(
-                               streamSource.GetInputStreamAt(0L),
-                               inMemoryStream.GetOutputStreamAt(0L));
-                await copyAction.AsTask(cancellationTokenSource.Token);
-                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream);
-                ImagingCache.Add(uriSource, bitmapDecoder);
-            }
-
-            var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
-            var frameProperties = new List<FrameProperties>();
-
-            for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
-            {
-                var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask(cancellationTokenSource.Token).ConfigureAwait(false); ;
-                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
-            }
-
-            _frameProperties = frameProperties;
-            _bitmapDecoder = bitmapDecoder;
-            _imageProperties = imageProperties;
-            _dispatcher = dispatcher;
-
-            await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             {
-                 CreateCanvasResources();
-                 var uri = image.Tag as Uri;
-                 if (uri == uriSource)
-                 {
-                     image.Source = _canvasImageSource;
-                 }
-             });
-
-            _isInitialized = true;
-            return new ImagePackage(this, _canvasImageSource, _imageProperties.PixelWidth, _imageProperties.PixelHeight); ;
-        }
 
         public void Start()
         {
@@ -550,6 +502,54 @@ namespace ImageLib.Gif
                 _accumulationRenderTarget = null;
                 _animationTimer = null;
             }
+        }
+
+
+
+        public IAsyncOperation<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource, IRandomAccessStream streamSource)
+        {
+            return AsyncInfo.Run<ImagePackage>(
+        async (token) =>
+        {
+            var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
+            if (bitmapDecoder == null)
+            {
+                var inMemoryStream = new InMemoryRandomAccessStream();
+                var copyAction = RandomAccessStream.CopyAndCloseAsync(
+                               streamSource.GetInputStreamAt(0L),
+                               inMemoryStream.GetOutputStreamAt(0L));
+                await copyAction.AsTask();
+                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream);
+                ImagingCache.Add(uriSource, bitmapDecoder);
+            }
+
+            var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
+            var frameProperties = new List<FrameProperties>();
+
+            for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
+            {
+                var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask().ConfigureAwait(false); ;
+                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
+            }
+
+            _frameProperties = frameProperties;
+            _bitmapDecoder = bitmapDecoder;
+            _imageProperties = imageProperties;
+            _dispatcher = dispatcher;
+
+            await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                CreateCanvasResources();
+                var uri = image.Tag as Uri;
+                if (uri == uriSource)
+                {
+                    image.Source = _canvasImageSource;
+                }
+            });
+            _isInitialized = true;
+            return new ImagePackage(this, _canvasImageSource, _imageProperties.PixelWidth, _imageProperties.PixelHeight); ;
+
+        });
         }
 
 

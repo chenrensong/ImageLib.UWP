@@ -25,6 +25,11 @@
                 Stretch="None"
                />
 
-        
+        <Controls:ImageView 
+                Margin="0,20" 
+                x:Name="test1"
+                UriSource="ms-appx:///Images/test.webp"
+                Stretch="None"
+               />
     </StackPanel>
 </Page>

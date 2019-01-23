@@ -32,6 +32,50 @@ bool WebpCodec::GetInfo(const Array<byte> ^data, __RPC__deref_out_opt int* width
 	return WebPGetInfo(data->Data, data->Length, width, height) ? true : false;
 }
 
+bool WebpCodec::GetFrameInfo(const Array<byte> ^data, __RPC__deref_out_opt int* numLoops, __RPC__deref_out_opt int* numFrames) {
+
+	WebPData webpData = WebPData();
+	webpData.bytes = reinterpret_cast<const uint8_t*>(data->Data);
+	webpData.size = static_cast<std::size_t>(data->Length);
+	WebPDemuxer *demuxer = WebPDemux(&webpData);
+	if (!demuxer)
+	{
+		return false;
+	}
+
+	*numLoops = static_cast<int>(WebPDemuxGetI(demuxer, WEBP_FF_LOOP_COUNT));
+	*numFrames = static_cast<int>(WebPDemuxGetI(demuxer, WEBP_FF_FRAME_COUNT));
+	WebPIterator iter;
+	iter.duration = 100;
+	if (!WebPDemuxGetFrame(demuxer, 1, &iter))
+	{
+		WebPDemuxDelete(demuxer);
+		return false;
+	}
+
+	WebPDemuxDelete(demuxer);
+	return true;
+}
+
+bool WebpCodec::GetInfo(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height,
+	__RPC__deref_out_opt bool* has_alpha, __RPC__deref_out_opt bool* has_animation, __RPC__deref_out_opt int* format) {
+	WebPBitstreamFeatures features = WebPBitstreamFeatures();
+	VP8StatusCode statusCode = WebPGetFeatures(data->Data, data->Length, &features);
+	if (statusCode != VP8_STATUS_OK) {
+		return false;
+	}
+	if (width != NULL) {
+		*width = features.width;
+	}
+	if (height != NULL) {
+		*height = features.height;
+	}
+	*has_alpha = features.has_alpha == 1;
+	*has_animation = features.has_animation == 1;
+	*format = features.format;
+	return true;
+}
+
 Array<byte> ^ WebpCodec::Parse(const Array<byte> ^data, __RPC__deref_out_opt int* width, __RPC__deref_out_opt int* height) {
 	if (!WebPGetInfo(data->Data, data->Length, width, height)) {
 		return nullptr;

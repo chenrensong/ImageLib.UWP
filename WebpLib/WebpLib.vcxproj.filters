@@ -113,6 +113,7 @@
     <ClCompile Include="enc\delta_palettization.cpp" />
     <ClCompile Include="enc\near_lossless.cpp" />
     <ClCompile Include="mux\anim_encode.cpp" />
+    <ClCompile Include="WebPFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -159,5 +160,6 @@
     <ClInclude Include="utils\bit_reader_inl.h" />
     <ClInclude Include="utils\endian_inl.h" />
     <ClInclude Include="webp\extras.h" />
+    <ClInclude Include="WebPFrame.h" />
   </ItemGroup>
 </Project>

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel;
+using ImageLib.Support;
 
 namespace ImageLib.Controls
 {
@@ -149,7 +150,7 @@ namespace ImageLib.Controls
             this.PixelWidth = 0d;
             _image.Source = null;
             _image.Tag = null;
-            _imagePackage?.Dispose();
+            _imagePackage?.Release();
             Interlocked.Exchange(ref _imagePackage, null);
             var uriSource = UriSource;
             if (uriSource == null)
@@ -189,7 +190,7 @@ namespace ImageLib.Controls
         /// <returns></returns>
         private async Task<ImageSource> RequestUri(Image image, Uri uriSource, CancellationTokenSource cancellationTokenSource)
         {
-            //Debug模式不允许Decoders,直接采用默认方案
+            //设计模式不允许使用Decoders,直接采用默认方案
             if (DesignMode.DesignModeEnabled)
             {
                 image.Source = new BitmapImage(uriSource);
