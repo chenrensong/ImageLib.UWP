@@ -12,7 +12,7 @@
                 .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
                 .NewApi(false)
                 .AddDecoder<GifDecoder>()
-                .AddDecoder<WebpDecoder>()
+                .AddDecoder<WebPDecoder>()
                 .Build();
             ImageLoader.Initialize(config);
 ```
@@ -29,7 +29,7 @@
                 .LimitedStorageCache(ApplicationData.Current.LocalCacheFolder, "cache", new SHA1CacheGenerator(), 1024 * 1024 * 1024)
                 .NewApi(false)
                 .AddDecoder<GifDecoder>()
-                .AddDecoder<WebpDecoder>()
+                .AddDecoder<WebPDecoder>()
                 .Build();
     ImageLoader.Register("test", config);
 ```
