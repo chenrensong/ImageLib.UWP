@@ -9,9 +9,13 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="WebPDecoder.cpp" />
+    <ClCompile Include="WebPBitmapFrame.cpp" />
+    <ClCompile Include="WebPImage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="WebPDecoder.h" />
+    <ClInclude Include="WebPBitmapFrame.h" />
+    <ClInclude Include="WebPImage.h" />
   </ItemGroup>
 </Project>

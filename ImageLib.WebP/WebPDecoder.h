@@ -1,5 +1,7 @@
 #pragma once
+#include "WebPImage.h"
 using namespace ImageLib::Support;
+using namespace Windows::UI::Xaml;
 namespace ImageLib
 {
 	namespace WebP
@@ -8,12 +10,21 @@ namespace ImageLib
 		public ref class WebPDecoder sealed : IImageDecoder
 		{
 		private:
-			int headerSize = 12;
+			ImageLib::WebP::WebPImage^ _webPImage = nullptr;
+			Windows::UI::Xaml::Controls::Image ^ _image = nullptr;
+			bool _isAnimating = false;
+			bool _isInitialized = false;
+			int _currentFrameIndex = 0;
+			int _completedLoops = 0;
+			int _headerSize = 12;
+
+			//WriteableBitmap^ _writeableBitmap = nullptr;
+			Windows::UI::Xaml::DispatcherTimer^ _animationTimer = nullptr;
 		public:
 			WebPDecoder();
 			virtual	property int HeaderSize
 			{
-				int get() { return headerSize; }
+				int get() { return _headerSize; }
 			}
 
 			virtual int GetPriority(Windows::Storage::Streams::IBuffer ^headerBuffer);
@@ -28,6 +39,7 @@ namespace ImageLib
 
 
 
+			void OnTick(Platform::Object ^sender, Platform::Object ^args);
 		};
 
 	}

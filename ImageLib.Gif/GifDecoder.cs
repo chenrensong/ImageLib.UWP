@@ -29,7 +29,7 @@ using Windows.UI.Xaml.Media;
 
 namespace ImageLib.Gif
 {
-    public sealed class GifDecoder : IImageDecoder, IDisposable
+    public sealed partial class GifDecoder : IImageDecoder, IDisposable
     {
         /// <summary>
         /// Gif头为6
@@ -42,67 +42,11 @@ namespace ImageLib.Gif
             }
         }
 
-
         public int GetPriority(IBuffer headerBuffer)
         {
             var isGifFormat = ImageFormat.IsGif(headerBuffer);
             return isGifFormat ? 1 : -1;
         }
-
-        #region Private struct declarations
-        private struct ImageProperties
-        {
-            public readonly int PixelWidth;
-            public readonly int PixelHeight;
-            public readonly bool IsAnimated;
-            public readonly int LoopCount;
-
-            public ImageProperties(int pixelWidth, int pixelHeight, bool isAnimated, int loopCount)
-            {
-                PixelWidth = pixelWidth;
-                PixelHeight = pixelHeight;
-                IsAnimated = isAnimated;
-                LoopCount = loopCount;
-            }
-        }
-
-        internal struct FrameProperties
-        {
-            public readonly Rect Rect;
-            public readonly double DelayMilliseconds;
-            public readonly bool ShouldDispose;
-            public readonly uint FrameIndex;
-
-            public FrameProperties(uint frameIndex, Rect rect, double delayMilliseconds, bool shouldDispose)
-            {
-                FrameIndex = frameIndex;
-                Rect = rect;
-                DelayMilliseconds = delayMilliseconds;
-                ShouldDispose = shouldDispose;
-            }
-        }
-
-
-        public async Task<byte[]> DecodePixelAsync(uint frameIndex)
-        {
-            BitmapFrame bitmapFrame = null;
-            if (!_bitmapFrameCache.TryGetValue(frameIndex, out bitmapFrame))
-            {
-                bitmapFrame = await _bitmapDecoder.GetFrameAsync(frameIndex);
-                _bitmapFrameCache.Add(frameIndex, bitmapFrame);
-            }
-            var pixelData = await bitmapFrame.GetPixelDataAsync(
-               BitmapPixelFormat.Bgra8,
-               BitmapAlphaMode.Premultiplied,
-               new BitmapTransform(),
-               ExifOrientationMode.IgnoreExifOrientation,
-               ColorManagementMode.DoNotColorManage
-               ).AsTask().ConfigureAwait(false);
-            return pixelData.DetachPixelData();
-        }
-
-        #endregion
-
 
         private WeakRefDictionary<uint, BitmapFrame> _bitmapFrameCache = new WeakRefDictionary<uint, BitmapFrame>();
         private DispatcherTimer _animationTimer;
@@ -122,8 +66,6 @@ namespace ImageLib.Gif
         private bool _isAnimating;
         private bool _hasCanvasResources;
         private CoreDispatcher _dispatcher;
-
-
 
 
         public void Start()
@@ -167,6 +109,24 @@ namespace ImageLib.Gif
             _isAnimating = false;
         }
 
+
+        public async Task<byte[]> DecodePixelAsync(uint frameIndex)
+        {
+            BitmapFrame bitmapFrame = null;
+            if (!_bitmapFrameCache.TryGetValue(frameIndex, out bitmapFrame))
+            {
+                bitmapFrame = await _bitmapDecoder.GetFrameAsync(frameIndex);
+                _bitmapFrameCache.Add(frameIndex, bitmapFrame);
+            }
+            var pixelData = await bitmapFrame.GetPixelDataAsync(
+               BitmapPixelFormat.Bgra8,
+               BitmapAlphaMode.Premultiplied,
+               new BitmapTransform(),
+               ExifOrientationMode.IgnoreExifOrientation,
+               ColorManagementMode.DoNotColorManage
+               ).AsTask().ConfigureAwait(false);
+            return pixelData.DetachPixelData();
+        }
 
         private async Task FrameLooper()
         {
@@ -331,7 +291,6 @@ namespace ImageLib.Gif
                     drawingSession.DrawImage(frameBitmap, frameRectangle);
                 }
             }
-
         }
 
         private void UpdateImageSource(byte[] pixels, Rect updateRectangle)
@@ -508,48 +467,47 @@ namespace ImageLib.Gif
 
         public IAsyncOperation<ImagePackage> InitializeAsync(CoreDispatcher dispatcher, Image image, Uri uriSource, IRandomAccessStream streamSource)
         {
-            return AsyncInfo.Run<ImagePackage>(
-        async (token) =>
-        {
-            var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
-            if (bitmapDecoder == null)
+            return AsyncInfo.Run<ImagePackage>(async (token) =>
             {
-                var inMemoryStream = new InMemoryRandomAccessStream();
-                var copyAction = RandomAccessStream.CopyAndCloseAsync(
-                               streamSource.GetInputStreamAt(0L),
-                               inMemoryStream.GetOutputStreamAt(0L));
-                await copyAction.AsTask();
-                bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream);
-                ImagingCache.Add(uriSource, bitmapDecoder);
-            }
-
-            var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
-            var frameProperties = new List<FrameProperties>();
-
-            for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
-            {
-                var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask().ConfigureAwait(false); ;
-                frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
-            }
-
-            _frameProperties = frameProperties;
-            _bitmapDecoder = bitmapDecoder;
-            _imageProperties = imageProperties;
-            _dispatcher = dispatcher;
-
-            await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                CreateCanvasResources();
-                var uri = image.Tag as Uri;
-                if (uri == uriSource)
+                var bitmapDecoder = ImagingCache.Get<BitmapDecoder>(uriSource);
+                if (bitmapDecoder == null)
                 {
-                    image.Source = _canvasImageSource;
+                    var inMemoryStream = new InMemoryRandomAccessStream();
+                    var copyAction = RandomAccessStream.CopyAndCloseAsync(
+                                   streamSource.GetInputStreamAt(0L),
+                                   inMemoryStream.GetOutputStreamAt(0L));
+                    await copyAction.AsTask();
+                    bitmapDecoder = await BitmapDecoder.CreateAsync(BitmapDecoder.GifDecoderId, inMemoryStream);
+                    ImagingCache.Add(uriSource, bitmapDecoder);
                 }
-            });
-            _isInitialized = true;
-            return new ImagePackage(this, _canvasImageSource, _imageProperties.PixelWidth, _imageProperties.PixelHeight); ;
 
-        });
+                var imageProperties = await RetrieveImagePropertiesAsync(bitmapDecoder);
+                var frameProperties = new List<FrameProperties>();
+
+                for (var i = 0u; i < bitmapDecoder.FrameCount; i++)
+                {
+                    var bitmapFrame = await bitmapDecoder.GetFrameAsync(i).AsTask().ConfigureAwait(false); ;
+                    frameProperties.Add(await RetrieveFramePropertiesAsync(i, bitmapFrame));
+                }
+
+                _frameProperties = frameProperties;
+                _bitmapDecoder = bitmapDecoder;
+                _imageProperties = imageProperties;
+                _dispatcher = dispatcher;
+
+                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    CreateCanvasResources();
+                    var uri = image.Tag as Uri;
+                    if (uri == uriSource)
+                    {
+                        image.Source = _canvasImageSource;
+                    }
+                });
+                _isInitialized = true;
+                return new ImagePackage(this, _canvasImageSource, _imageProperties.PixelWidth, _imageProperties.PixelHeight); ;
+
+            });
         }
 
 

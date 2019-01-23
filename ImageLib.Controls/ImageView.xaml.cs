@@ -204,6 +204,7 @@ namespace ImageLib.Controls
             {
                 throw new Exception("package is null");
             }
+
             Interlocked.Exchange(ref _imagePackage, package);
             await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {

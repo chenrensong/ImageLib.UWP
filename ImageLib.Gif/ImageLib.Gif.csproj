@@ -104,13 +104,15 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FrameProperties.cs" />
     <Compile Include="GifDecoder.cs" />
+    <Compile Include="ImageProperties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Properties\ImageLib.Gif.rd.xml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.2</Version>
+      <Version>6.2.3</Version>
     </PackageReference>
     <PackageReference Include="Win2D.uwp">
       <Version>1.23.0</Version>

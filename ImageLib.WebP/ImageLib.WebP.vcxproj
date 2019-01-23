@@ -269,7 +269,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="WebPBitmapFrame.h" />
     <ClInclude Include="WebPDecoder.h" />
+    <ClInclude Include="WebPImage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -282,7 +284,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WebPBitmapFrame.cpp" />
     <ClCompile Include="WebPDecoder.cpp" />
+    <ClCompile Include="WebPImage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageLib.Support\ImageLib.Support.csproj">
