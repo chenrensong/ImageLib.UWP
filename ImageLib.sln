@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Core", "ImageLib.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Support", "ImageLib.Support\ImageLib.Support.csproj", "{7D371F35-508B-448D-9519-44BE756284C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -169,28 +167,6 @@ Global
 		{7D371F35-508B-448D-9519-44BE756284C0}.Release|x64.Build.0 = Release|x64
 		{7D371F35-508B-448D-9519-44BE756284C0}.Release|x86.ActiveCfg = Release|x86
 		{7D371F35-508B-448D-9519-44BE756284C0}.Release|x86.Build.0 = Release|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|ARM.ActiveCfg = Debug|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|ARM.Build.0 = Debug|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|ARM.Deploy.0 = Debug|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x64.ActiveCfg = Debug|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x64.Build.0 = Debug|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x64.Deploy.0 = Debug|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x86.ActiveCfg = Debug|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x86.Build.0 = Debug|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Debug|x86.Deploy.0 = Debug|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|Any CPU.ActiveCfg = Release|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|ARM.ActiveCfg = Release|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|ARM.Build.0 = Release|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|ARM.Deploy.0 = Release|ARM
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|ARM64.ActiveCfg = Release|ARM64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x64.ActiveCfg = Release|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x64.Build.0 = Release|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x64.Deploy.0 = Release|x64
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x86.ActiveCfg = Release|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x86.Build.0 = Release|x86
-		{669DFDEA-C551-4FC9-BB8C-E8CE2DAA04A5}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
