@@ -17,7 +17,7 @@
             ImageLoader.Initialize(config);
 ```
 ## XAML代码
-``` xaml
+```
  <controls:ImageView 
            Margin="0,20"
            UriSource="ms-appx:///Images/2.gif"
@@ -34,7 +34,7 @@
     ImageLoader.Register("test", config);
 ```
 
-``` xaml
+```
  <controls:ImageView 
            ImageLoaderKey="test"
            UriSource="ms-appx:///Images/2.gif"
@@ -42,7 +42,11 @@
 ```
 
 ##支持URI格式
-  http:, https:, ms-appx:,ms-appdata:,ms-resource;
+  http:
+  https:
+  ms-appx:
+  ms-appdata:
+  ms-resource:
   
 ##支持平台
   **Client:** Windows 10
