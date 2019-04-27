@@ -41,24 +41,24 @@
            Stretch="None"/>
 ```
 
-##支持URI格式
+## 支持URI格式
   http:
   https:
   ms-appx:
   ms-appdata:
   ms-resource:
   
-##支持平台
+## 支持平台
   **Client:** Windows 10
   
   **Server:** Windows Server 2016 
   
   **Phone:**  Windows 10 
   
-##开发工具
+## 开发工具
   Visual Studio 2019
   
-##Nuget
+## Nuget
 ``` c#
 PM> Install-Package ImageLib.UWP
 ```
