@@ -33,7 +33,8 @@
                 .Build();
     ImageLoader.Register("test", config);
 ```
-``` xaml
+
+``` c#
  <controls:ImageView 
            ImageLoaderKey="test"
            UriSource="ms-appx:///Images/2.gif"
