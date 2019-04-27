@@ -169,7 +169,7 @@
       <Project>{7d371f35-508b-448d-9519-44be756284c0}</Project>
       <Name>ImageLib.Support</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageLib.Webp\ImageLib.Webp.vcxproj">
+    <ProjectReference Include="..\ImageLib.WebP\ImageLib.WebP.vcxproj">
       <Project>{9e7b142f-39eb-40dd-8fb7-28cb1a396661}</Project>
       <Name>ImageLib.WebP</Name>
     </ProjectReference>

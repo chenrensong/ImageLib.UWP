@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Controls", "ImageL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageLib.Gif", "ImageLib.Gif\ImageLib.Gif.csproj", "{248A9A1C-18A7-4101-9EBF-CFE1FC23A1B0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLib.WebP", "ImageLib.Webp\ImageLib.Webp.vcxproj", "{9E7B142F-39EB-40DD-8FB7-28CB1A396661}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLib.WebP", "ImageLib.WebP\ImageLib.WebP.vcxproj", "{9E7B142F-39EB-40DD-8FB7-28CB1A396661}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwebp", "libwebp\libwebp.vcxproj", "{E4181500-DA02-492D-9018-CB83CF355786}"
 EndProject

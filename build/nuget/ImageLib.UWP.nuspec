@@ -26,8 +26,8 @@
     <file src="..\..\bin\ImageLib.Core.dll" target="lib\uap10.0"/>
     <file src="..\..\bin\ImageLib.Controls.dll" target="lib\uap10.0"/>
     <file src="..\..\bin\ImageLib.Support.winmd" target="lib\uap10.0"/>
-    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.winmd" target="lib\uap10.0"/>
-    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.pri" target="lib\uap10.0"/>
+    <file src="..\..\Release\ImageLib.WebP\ImageLib.WebP.winmd" target="lib\uap10.0"/>
+    <file src="..\..\Release\ImageLib.WebP\ImageLib.WebP.pri" target="lib\uap10.0"/>
     
     <file src="..\..\bin\ImageLib.Controls.pri" target="lib\uap10.0"/>
     <file src="..\..\bin\ImageLib.Core.pri" target="lib\uap10.0"/>
@@ -42,15 +42,15 @@
     <file src="..\..\ImageLib.Core\Properties\ImageLib.Core.rd.xml" target="lib\uap10.0\ImageLib.Core\Properties"/>
     
     <!-- DLLs and resources -->
-    <file src="..\..\ARM\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-arm\native"/>
-    <file src="..\..\ARM\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-arm\native"/>
+    <file src="..\..\ARM\Release\ImageLib.WebP\ImageLib.WebP.dll" target="runtimes\win10-arm\native"/>
+    <file src="..\..\ARM\Release\ImageLib.WebP\ImageLib.WebP.pri" target="runtimes\win10-arm\native"/>
 
-    <file src="..\..\x64\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-x64\native"/>
-    <file src="..\..\x64\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-x64\native"/>
+    <file src="..\..\x64\Release\ImageLib.WebP\ImageLib.WebP.dll" target="runtimes\win10-x64\native"/>
+    <file src="..\..\x64\Release\ImageLib.WebP\ImageLib.WebP.pri" target="runtimes\win10-x64\native"/>
 
 
-    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-x86\native"/>
-    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-x86\native"/>
+    <file src="..\..\Release\ImageLib.WebP\ImageLib.WebP.dll" target="runtimes\win10-x86\native"/>
+    <file src="..\..\Release\ImageLib.WebP\ImageLib.WebP.pri" target="runtimes\win10-x86\native"/>
 
     <!-- .targets -->
     <file src="ImageLib.UWP.targets" target="build\native"/>
