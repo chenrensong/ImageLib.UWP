@@ -34,7 +34,7 @@
     ImageLoader.Register("test", config);
 ```
 
-``` c#
+``` xaml
  <controls:ImageView 
            ImageLoaderKey="test"
            UriSource="ms-appx:///Images/2.gif"
