@@ -39,6 +39,7 @@
            UriSource="ms-appx:///Images/2.gif"
            Stretch="None"/>
 ```
+
 ##支持URI格式
   http:, https:, ms-appx:,ms-appdata:,ms-resource;
   
