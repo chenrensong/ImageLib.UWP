@@ -59,7 +59,7 @@
   Visual Studio 2019
   
 ## Nuget
-``` c#
+```
 PM> Install-Package ImageLib.UWP
 ```
 
