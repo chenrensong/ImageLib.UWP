@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.271
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{9A9F8361-C036-4360-B480-C67D2E1CFA02}"
 EndProject
@@ -114,7 +114,7 @@ Global
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|ARM.ActiveCfg = Debug|ARM
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|ARM.Build.0 = Debug|ARM
-		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|ARM64.ActiveCfg = Debug|ARM
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|x64.ActiveCfg = Debug|x64
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|x64.Build.0 = Debug|x64
 		{E4181500-DA02-492D-9018-CB83CF355786}.Debug|x86.ActiveCfg = Debug|Win32
@@ -122,7 +122,7 @@ Global
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|Any CPU.ActiveCfg = Release|Win32
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|ARM.ActiveCfg = Release|ARM
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|ARM.Build.0 = Release|ARM
-		{E4181500-DA02-492D-9018-CB83CF355786}.Release|ARM64.ActiveCfg = Release|Win32
+		{E4181500-DA02-492D-9018-CB83CF355786}.Release|ARM64.ActiveCfg = Release|ARM
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|x64.ActiveCfg = Release|x64
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|x64.Build.0 = Release|x64
 		{E4181500-DA02-492D-9018-CB83CF355786}.Release|x86.ActiveCfg = Release|Win32
