@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ImageLib.UWP</id>
+    <version>6.2.0</version>
+    <title>ImageLib.UWP</title>
+    <authors>陈仁松</authors>
+    <owners>陈仁松</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/chenrensong/ImageLib.UWP</projectUrl>
+    <description>支持Universal Windows Platform(UWP)，基于微软最新的2d图形加速引擎Win2d，支持gif、jpg、png、webp等格式。 同时支持实现IImageDecoder接口来支持更多图片格式。</description>
+    <summary>支持Universal Windows Platform(UWP)，基于微软最新的2d图形加速引擎Win2d，支持gif、jpg、png等格式 — Edit</summary>
+    <copyright>Copyright (c) Chenrensong. All rights reserved.</copyright>
+    <tags>gif;png;jpg;webp</tags>
+    <dependencies>
+      <dependency id="Win2D.uwp" version="1.23.0" />
+    </dependencies>
+
+
+  </metadata>
+  <files>
+
+    <!-- WinMd and IntelliSense -->
+    <file src="..\..\bin\ImageLib.Gif.dll" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Core.dll" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Controls.dll" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Support.winmd" target="lib\uap10.0"/>
+    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.winmd" target="lib\uap10.0"/>
+    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.pri" target="lib\uap10.0"/>
+    
+    <file src="..\..\bin\ImageLib.Controls.pri" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Core.pri" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Gif.pri" target="lib\uap10.0"/>
+    <file src="..\..\bin\ImageLib.Support.pri" target="lib\uap10.0"/>
+    
+    <!-- XAML controls -->
+    <file src="..\..\bin\ImageView.xbf" target="lib\uap10.0\ImageLib.Controls"/>
+    <file src="..\..\bin\ImageLib.Controls.xr.xml" target="lib\uap10.0\ImageLib.Controls"/>
+    <file src="..\..\ImageLib.Controls\Properties\ImageLib.Controls.rd.xml" target="lib\uap10.0\ImageLib.Controls\Properties"/>
+    <file src="..\..\ImageLib.Gif\Properties\ImageLib.Gif.rd.xml" target="lib\uap10.0\ImageLib.Gif\Properties"/>
+    <file src="..\..\ImageLib.Core\Properties\ImageLib.Core.rd.xml" target="lib\uap10.0\ImageLib.Core\Properties"/>
+    
+    <!-- DLLs and resources -->
+    <file src="..\..\ARM\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-arm\native"/>
+    <file src="..\..\ARM\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-arm\native"/>
+
+    <file src="..\..\x64\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-x64\native"/>
+    <file src="..\..\x64\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-x64\native"/>
+
+
+    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.dll" target="runtimes\win10-x86\native"/>
+    <file src="..\..\Release\ImageLib.Webp\ImageLib.Webp.pri" target="runtimes\win10-x86\native"/>
+
+    <!-- .targets -->
+    <file src="ImageLib.UWP.targets" target="build\native"/>
+  </files>
+</package>

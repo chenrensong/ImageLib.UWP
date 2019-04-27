@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ImageLib-Platform Condition="'$(Platform)' == 'Win32'">x86</ImageLib-Platform>
+    <ImageLib-Platform Condition="'$(Platform)' != 'Win32'">$(Platform)</ImageLib-Platform>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'UAP'">
+    <Reference Include="$(MSBuildThisFileDirectory)..\..\lib\uap10.0\ImageLib.WebP.winmd">
+      <Implementation>ImageLib.WebP.dll</Implementation>
+    </Reference>
+    <ReferenceCopyLocalPaths Include="$(MSBuildThisFileDirectory)..\..\runtimes\win10-$(ImageLib-Platform)\native\ImageLib.WebP.dll" />
+  </ItemGroup>
+</Project>
