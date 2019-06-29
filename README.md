@@ -51,8 +51,6 @@
 ## 支持平台
   **Client:** Windows 10
   
-  **Server:** Windows Server 2016 
-  
   **Phone:**  Windows 10 
   
 ## 开发工具
